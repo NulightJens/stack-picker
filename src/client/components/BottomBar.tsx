@@ -58,8 +58,6 @@ export default function BottomBar({ mode, selected, pickedCount, onAction }: Pro
           />
         ) : (
           <HoverStrip
-            mode={mode}
-            selected={selected}
             pickedCount={pickedCount}
             inline={inline}
             overflow={overflow}
@@ -163,8 +161,6 @@ function HoverStrip({
   picks,
   onAction,
 }: {
-  mode: StackMode
-  selected: SelectedStack
   pickedCount: number
   inline: Pick[]
   overflow: number
@@ -186,6 +182,12 @@ function HoverStrip({
     if (closeTimer.current != null) window.clearTimeout(closeTimer.current)
     closeTimer.current = window.setTimeout(() => setPopoverOpen(false), CLOSE_DELAY_MS)
   }
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current != null) window.clearTimeout(closeTimer.current)
+    }
+  }, [])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
