@@ -1,0 +1,339 @@
+import type { StackMode } from './types'
+
+export const APP_MODE: StackMode = {
+  id: 'app',
+  name: 'App Stack',
+  tagline: 'Click through each layer. Build your stack. Ship it.',
+  layers: [
+    {
+      id: 'frontend', name: 'Frontend', subtitle: 'UI framework',
+      items: [
+        { id: 'nextjs', name: 'Next.js' },
+        { id: 'react', name: 'React' },
+        { id: 'vue', name: 'Vue' },
+        { id: 'svelte', name: 'Svelte' },
+        { id: 'astro', name: 'Astro' },
+        { id: 'solidjs', name: 'SolidJS' },
+        { id: 'angular', name: 'Angular' },
+        { id: 'remix', name: 'Remix' },
+        { id: 'nuxt', name: 'Nuxt' },
+      ],
+    },
+    {
+      id: 'styling', name: 'Styling / UI', subtitle: 'Look & feel',
+      items: [
+        { id: 'tailwind', name: 'Tailwind CSS' },
+        { id: 'shadcn', name: 'shadcn/ui' },
+        { id: 'radix', name: 'Radix UI' },
+        { id: 'chakra', name: 'Chakra UI' },
+        { id: 'mantine', name: 'Mantine' },
+        { id: 'mui', name: 'MUI' },
+        { id: 'bootstrap', name: 'Bootstrap' },
+      ],
+    },
+    {
+      id: 'backend', name: 'Backend Runtime', subtitle: 'What runs your code',
+      items: [
+        { id: 'nodejs', name: 'Node.js' },
+        { id: 'bun', name: 'Bun' },
+        { id: 'deno', name: 'Deno' },
+        { id: 'python-fastapi', name: 'Python (FastAPI)' },
+        { id: 'go', name: 'Go' },
+        { id: 'rails', name: 'Ruby on Rails' },
+        { id: 'phoenix', name: 'Elixir / Phoenix' },
+        { id: 'nestjs', name: 'NestJS' },
+        { id: 'hono', name: 'Hono' },
+        { id: 'dotnet', name: 'ASP.NET Core' },
+        { id: 'spring', name: 'Spring Boot' },
+      ],
+    },
+    {
+      id: 'hosting', name: 'Compute / Hosting', subtitle: 'Where it lives',
+      items: [
+        { id: 'vercel', name: 'Vercel' },
+        { id: 'cloudflare-workers', name: 'Cloudflare Workers' },
+        { id: 'aws-lambda', name: 'AWS Lambda' },
+        { id: 'aws-ec2', name: 'AWS EC2' },
+        { id: 'gcp-run', name: 'Google Cloud Run' },
+        { id: 'azure-app', name: 'Azure App Service' },
+        { id: 'fly', name: 'Fly.io' },
+        { id: 'railway', name: 'Railway' },
+        { id: 'render', name: 'Render' },
+        { id: 'netlify', name: 'Netlify' },
+        { id: 'digitalocean', name: 'DigitalOcean' },
+      ],
+    },
+    {
+      id: 'database', name: 'Database', subtitle: 'Where data sleeps',
+      items: [
+        { id: 'postgres', name: 'PostgreSQL' },
+        { id: 'neon', name: 'Neon' },
+        { id: 'supabase', name: 'Supabase' },
+        { id: 'planetscale', name: 'PlanetScale' },
+        { id: 'mysql', name: 'MySQL' },
+        { id: 'mongodb', name: 'MongoDB' },
+        { id: 'firebase', name: 'Firebase' },
+        { id: 'dynamodb', name: 'DynamoDB' },
+        { id: 'convex', name: 'Convex' },
+        { id: 'turso', name: 'Turso' },
+        { id: 'd1', name: 'Cloudflare D1' },
+        { id: 'redis', name: 'Redis' },
+      ],
+    },
+    {
+      id: 'orm', name: 'ORM / Data Layer', subtitle: 'How you query',
+      items: [
+        { id: 'prisma', name: 'Prisma' },
+        { id: 'drizzle', name: 'Drizzle' },
+        { id: 'kysely', name: 'Kysely' },
+        { id: 'typeorm', name: 'TypeORM' },
+        { id: 'sequelize', name: 'Sequelize' },
+        { id: 'raw-sql', name: 'Raw SQL' },
+      ],
+    },
+    {
+      id: 'auth', name: 'Auth', subtitle: "Who's logging in",
+      items: [
+        { id: 'clerk', name: 'Clerk' },
+        { id: 'auth0', name: 'Auth0' },
+        { id: 'supabase-auth', name: 'Supabase Auth' },
+        { id: 'authjs', name: 'Auth.js (NextAuth)' },
+        { id: 'workos', name: 'WorkOS' },
+        { id: 'firebase-auth', name: 'Firebase Auth' },
+        { id: 'better-auth', name: 'Better Auth' },
+        { id: 'cognito', name: 'AWS Cognito' },
+      ],
+    },
+    {
+      id: 'storage', name: 'File / Blob Storage', subtitle: 'Big binary stuff',
+      items: [
+        { id: 's3', name: 'AWS S3' },
+        { id: 'r2', name: 'Cloudflare R2' },
+        { id: 'vercel-blob', name: 'Vercel Blob' },
+        { id: 'gcs', name: 'Google Cloud Storage' },
+        { id: 'azure-blob', name: 'Azure Blob' },
+        { id: 'uploadthing', name: 'UploadThing' },
+      ],
+    },
+    {
+      id: 'monitoring', name: 'Monitoring / APM', subtitle: 'Is it on fire?',
+      items: [
+        { id: 'sentry', name: 'Sentry' },
+        { id: 'datadog', name: 'Datadog' },
+        { id: 'newrelic', name: 'New Relic' },
+        { id: 'grafana', name: 'Grafana' },
+        { id: 'honeycomb', name: 'Honeycomb' },
+        { id: 'axiom', name: 'Axiom' },
+        { id: 'better-stack', name: 'Better Stack' },
+      ],
+    },
+    {
+      id: 'product-analytics', name: 'Product Analytics', subtitle: 'What users actually do',
+      items: [
+        { id: 'posthog', name: 'PostHog' },
+        { id: 'amplitude', name: 'Amplitude' },
+        { id: 'mixpanel', name: 'Mixpanel' },
+        { id: 'heap', name: 'Heap' },
+        { id: 'june', name: 'June' },
+        { id: 'statsig', name: 'Statsig' },
+      ],
+    },
+    {
+      id: 'web-analytics', name: 'Web Analytics', subtitle: 'Pageviews & vitals',
+      items: [
+        { id: 'ga', name: 'Google Analytics' },
+        { id: 'plausible', name: 'Plausible' },
+        { id: 'fathom', name: 'Fathom' },
+        { id: 'simple-analytics', name: 'Simple Analytics' },
+        { id: 'vercel-analytics', name: 'Vercel Analytics' },
+        { id: 'cf-analytics', name: 'Cloudflare Analytics' },
+      ],
+    },
+    {
+      id: 'email', name: 'Transactional Email', subtitle: 'Reset links & receipts',
+      items: [
+        { id: 'resend', name: 'Resend' },
+        { id: 'postmark', name: 'Postmark' },
+        { id: 'sendgrid', name: 'SendGrid' },
+        { id: 'ses', name: 'AWS SES' },
+        { id: 'mailgun', name: 'Mailgun' },
+        { id: 'loops', name: 'Loops' },
+      ],
+    },
+    {
+      id: 'payments', name: 'Payments', subtitle: 'Take the money',
+      items: [
+        { id: 'stripe', name: 'Stripe' },
+        { id: 'lemonsqueezy', name: 'Lemon Squeezy' },
+        { id: 'paddle', name: 'Paddle' },
+        { id: 'polar', name: 'Polar' },
+        { id: 'paypal', name: 'PayPal' },
+      ],
+    },
+    {
+      id: 'ai', name: 'AI / LLM', subtitle: 'The smart bits',
+      items: [
+        { id: 'anthropic', name: 'Anthropic Claude' },
+        { id: 'openai', name: 'OpenAI' },
+        { id: 'gemini', name: 'Google Gemini' },
+        { id: 'vercel-ai', name: 'Vercel AI Gateway' },
+        { id: 'replicate', name: 'Replicate' },
+        { id: 'together', name: 'Together AI' },
+        { id: 'groq', name: 'Groq' },
+      ],
+    },
+  ],
+}
+
+export const CONTENT_MODE: StackMode = {
+  id: 'content',
+  name: 'Content Stack',
+  tagline: 'Pick your content style, then the tools you run your operation on.',
+  layers: [
+    {
+      id: 'style', name: 'Content Style', subtitle: 'The flavor',
+      kind: 'style',
+      items: [
+        { id: 'ugc', name: 'UGC' },
+        { id: 'info', name: 'Info / Education' },
+        { id: 'entertainment', name: 'Entertainment' },
+        { id: 'edutainment', name: 'Edutainment' },
+        { id: 'tutorial', name: 'Tutorial / How-to' },
+        { id: 'review', name: 'Review / Reaction' },
+        { id: 'vlog', name: 'Vlog' },
+        { id: 'story', name: 'Storytelling / Docu' },
+        { id: 'news', name: 'News / Commentary' },
+      ],
+    },
+    {
+      id: 'ideation', name: 'Ideation', subtitle: 'Where ideas start',
+      items: [
+        { id: 'notion', name: 'Notion' },
+        { id: 'obsidian', name: 'Obsidian' },
+        { id: 'airtable', name: 'Airtable' },
+        { id: 'chatgpt', name: 'ChatGPT' },
+        { id: 'claude', name: 'Claude' },
+        { id: 'perplexity', name: 'Perplexity' },
+        { id: 'x-trends', name: 'X / Trends' },
+        { id: 'spyder', name: 'Trend scrapers' },
+      ],
+    },
+    {
+      id: 'scripting', name: 'Scripting / Writing', subtitle: 'Turning ideas into words',
+      items: [
+        { id: 'google-docs', name: 'Google Docs' },
+        { id: 'notion-w', name: 'Notion' },
+        { id: 'claude-w', name: 'Claude' },
+        { id: 'chatgpt-w', name: 'ChatGPT' },
+        { id: 'hemingway', name: 'Hemingway' },
+        { id: 'grammarly', name: 'Grammarly' },
+        { id: 'taja', name: 'Taja' },
+      ],
+    },
+    {
+      id: 'voice', name: 'Voiceover', subtitle: 'Your voice, or an AI one',
+      items: [
+        { id: 'self', name: 'Your own voice' },
+        { id: 'elevenlabs', name: 'ElevenLabs' },
+        { id: 'play-ht', name: 'Play.ht' },
+        { id: 'cartesia', name: 'Cartesia' },
+        { id: 'openai-voice', name: 'OpenAI TTS' },
+        { id: 'descript-overdub', name: 'Descript Overdub' },
+      ],
+    },
+    {
+      id: 'editing', name: 'Video Editing', subtitle: 'Cutting it together',
+      items: [
+        { id: 'capcut', name: 'CapCut' },
+        { id: 'premiere', name: 'Premiere Pro' },
+        { id: 'final-cut', name: 'Final Cut Pro' },
+        { id: 'davinci', name: 'DaVinci Resolve' },
+        { id: 'descript', name: 'Descript' },
+        { id: 'opus-clip', name: 'Opus Clip' },
+        { id: 'remotion', name: 'Remotion' },
+      ],
+    },
+    {
+      id: 'shortform', name: 'Short-form Platforms', subtitle: 'Quick hits',
+      items: [
+        { id: 'instagram-reels', name: 'Instagram Reels' },
+        { id: 'tiktok', name: 'TikTok' },
+        { id: 'youtube-shorts', name: 'YouTube Shorts' },
+        { id: 'linkedin-short', name: 'LinkedIn (short)' },
+        { id: 'x-video', name: 'X (video)' },
+      ],
+    },
+    {
+      id: 'longform', name: 'Long-form Platforms', subtitle: 'Deep content',
+      items: [
+        { id: 'youtube', name: 'YouTube' },
+        { id: 'podcast', name: 'Podcast (Spotify/Apple)' },
+        { id: 'blog', name: 'Blog / Newsletter' },
+        { id: 'linkedin-long', name: 'LinkedIn (long)' },
+        { id: 'twitch', name: 'Twitch' },
+      ],
+    },
+    {
+      id: 'thumbnails', name: 'Thumbnails & Graphics', subtitle: 'Stop-the-scroll art',
+      items: [
+        { id: 'figma', name: 'Figma' },
+        { id: 'canva', name: 'Canva' },
+        { id: 'photoshop', name: 'Photoshop' },
+        { id: 'midjourney', name: 'Midjourney' },
+        { id: 'nano-banana', name: 'Gemini (Nano Banana)' },
+        { id: 'ideogram', name: 'Ideogram' },
+      ],
+    },
+    {
+      id: 'scheduling', name: 'Scheduling & Publishing', subtitle: 'Get it live',
+      items: [
+        { id: 'buffer', name: 'Buffer' },
+        { id: 'hootsuite', name: 'Hootsuite' },
+        { id: 'later', name: 'Later' },
+        { id: 'metricool', name: 'Metricool' },
+        { id: 'publer', name: 'Publer' },
+        { id: 'native', name: 'Native schedulers' },
+      ],
+    },
+    {
+      id: 'analytics', name: 'Analytics', subtitle: 'Measure what works',
+      items: [
+        { id: 'native-insights', name: 'Native platform insights' },
+        { id: 'tubebuddy', name: 'TubeBuddy' },
+        { id: 'vidiq', name: 'vidIQ' },
+        { id: 'metricool-a', name: 'Metricool' },
+        { id: 'shield-app', name: 'Shield (LinkedIn)' },
+        { id: 'apify', name: 'Apify (custom scrapers)' },
+      ],
+    },
+    {
+      id: 'community', name: 'Community & Newsletter', subtitle: 'Own your audience',
+      items: [
+        { id: 'skool', name: 'Skool' },
+        { id: 'circle', name: 'Circle' },
+        { id: 'discord', name: 'Discord' },
+        { id: 'beehiiv', name: 'Beehiiv' },
+        { id: 'substack', name: 'Substack' },
+        { id: 'convertkit', name: 'ConvertKit / Kit' },
+      ],
+    },
+    {
+      id: 'monetization', name: 'Monetization', subtitle: 'Turn reach into revenue',
+      items: [
+        { id: 'adsense', name: 'YouTube AdSense' },
+        { id: 'sponsors', name: 'Brand sponsors' },
+        { id: 'affiliates', name: 'Affiliates' },
+        { id: 'digital-products', name: 'Digital products' },
+        { id: 'courses', name: 'Courses / cohorts' },
+        { id: 'coaching', name: '1:1 coaching' },
+        { id: 'saas', name: 'SaaS / tool' },
+      ],
+    },
+  ],
+}
+
+export const MODES: StackMode[] = [APP_MODE, CONTENT_MODE]
+
+export function getMode(id: string): StackMode {
+  return MODES.find(m => m.id === id) ?? APP_MODE
+}
