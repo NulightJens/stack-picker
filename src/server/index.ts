@@ -132,19 +132,21 @@ app.get('/api/health', (c) => c.json({ ok: true }))
 /**
  * GET /api/favicon?domain=<domain>
  *
- * Same-origin proxy for Google's s2/favicons service. The upstream always
- * 301-redirects to tN.gstatic.com; we follow that redirect manually
- * (rather than letting fetch auto-follow) because Wrangler's local
- * workerd flakes on auto-follow under concurrent load. We reject
- * non-https Location headers as a defensive check. Used by ItemLogo as
- * the primary logo source. Proxying (rather than direct <img src>):
- *   - Lets the browser treat the request as same-origin → html-to-image can
- *     embed favicons into exported PNGs without CORS drama.
- *   - Edge-caches via Cloudflare's default HTML/image caching, bounded by our
- *     own `immutable` Cache-Control (only on 2xx — transient upstream errors
- *     use `no-store` so a bad response can't be pinned for a month).
- *   - Lets us swap the upstream later (Favicon.im, DuckDuckGo, etc.) without
- *     touching every client call site.
+ * Same-origin proxy for DuckDuckGo's `icons.duckduckgo.com/ip3/<d>.ico`
+ * favicon service. Picked for reliability: single-hop response (no
+ * redirects), no User-Agent bot filtering, well-cached. Google's
+ * /s2/favicons was the first choice for aesthetic parity with the
+ * reference site, but it always 301-redirects to tN.gstatic.com and the
+ * local Wrangler/workerd runtime flakes on auto-following that redirect
+ * under the concurrent burst the browser fires on first page render.
+ * Visual result is equivalent — each site's own favicon on a white tile.
+ *
+ * Proxying (rather than direct <img src>):
+ *   - Lets the browser treat the request as same-origin → html-to-image
+ *     can embed favicons into exported PNGs without CORS drama.
+ *   - Lets us cache immutably on 2xx / `no-store` on failure so transient
+ *     upstream errors can't be pinned in the browser cache.
+ *   - Lets us swap the upstream later without touching the client.
  *
  * Domain regex is deliberately strict — no scheme, path, userinfo, IP
  * literals, or single-label hosts — to prevent SSRF via crafted `?domain=`
@@ -167,23 +169,10 @@ app.get('/api/favicon', async (c) => {
   }
   let upstream: Response
   try {
-    // Google's /s2/favicons always 301s to tN.gstatic.com. Wrangler's local
-    // workerd auto-follows redirects unreliably under concurrent load, so
-    // we do the redirect hop ourselves. One hop is enough — Google doesn't
-    // chain redirects past the gstatic CDN.
-    const initial = await fetch(
-      `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
-      { redirect: 'manual', signal: AbortSignal.timeout(3000) },
+    upstream = await fetch(
+      `https://icons.duckduckgo.com/ip3/${encodeURIComponent(domain)}.ico`,
+      { signal: AbortSignal.timeout(5000) },
     )
-    if (initial.status >= 300 && initial.status < 400) {
-      const location = initial.headers.get('Location')
-      if (!location || !location.startsWith('https://')) {
-        return c.json({ error: 'upstream unavailable' }, 502)
-      }
-      upstream = await fetch(location, { signal: AbortSignal.timeout(3000) })
-    } else {
-      upstream = initial
-    }
   } catch {
     return c.json({ error: 'upstream unavailable' }, 502)
   }
