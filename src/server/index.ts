@@ -176,14 +176,18 @@ app.get('/api/favicon', async (c) => {
   } catch {
     return c.json({ error: 'upstream unavailable' }, 502)
   }
-  const cacheControl = upstream.ok
-    ? 'public, max-age=2592000, immutable'
-    : 'no-store'
+  // On non-ok upstream (DDG serves a generic placeholder PNG with 404 for
+  // unknown domains), drop the body and return a clean error. Otherwise
+  // the placeholder renders as a real <img> in the browser and onError
+  // never fires, so ItemLogo can't fall through to Simple Icons / initials.
+  if (!upstream.ok) {
+    return c.json({ error: 'not found' }, 404)
+  }
   return new Response(upstream.body, {
-    status: upstream.status,
+    status: 200,
     headers: {
       'Content-Type': upstream.headers.get('Content-Type') ?? 'image/png',
-      'Cache-Control': cacheControl,
+      'Cache-Control': 'public, max-age=2592000, immutable',
       'Access-Control-Allow-Origin': '*',
     },
   })
