@@ -66,11 +66,16 @@ function rateLimitCheck(ip: string): { ok: boolean; retryAfterSec: number } {
   return { ok: true, retryAfterSec: 0 }
 }
 
-// CORS — only the configured SITE_URL may call the API
+// CORS + origin enforcement.
+// Browsers are protected by CORS; non-browser clients (curl, bots) ignore it,
+// so we also reject state-changing requests server-side when the Origin header
+// is absent or not on the allow-list. Safe methods (GET/HEAD) are exempt so
+// monitoring / healthchecks still work without an Origin.
 app.use('/api/*', async (c, next) => {
   const origin = c.req.header('Origin') ?? ''
-  const allowed = origin === c.env.SITE_URL
-  if (c.req.method === 'OPTIONS') {
+  const allowed = origin !== '' && origin === c.env.SITE_URL
+  const method = c.req.method
+  if (method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
       headers: {
@@ -80,6 +85,9 @@ app.use('/api/*', async (c, next) => {
         'Access-Control-Max-Age': '86400',
       },
     })
+  }
+  if (method !== 'GET' && method !== 'HEAD' && !allowed) {
+    return c.json({ error: 'Forbidden origin' }, 403)
   }
   await next()
   if (allowed) c.res.headers.set('Access-Control-Allow-Origin', origin)
@@ -199,6 +207,46 @@ app.post('/api/subscribe', async (c) => {
 
 app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
 
+// Wrap an asset response with the same security headers Hono applies to API
+// responses. Keeps HTML delivery out of Hono (which can't easily proxy a
+// Response body) while still guaranteeing headers on every byte we serve.
+function withSecurityHeaders(res: Response): Response {
+  const headers = new Headers(res.headers)
+  headers.set('X-Content-Type-Options', 'nosniff')
+  headers.set('X-Frame-Options', 'DENY')
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()')
+  const ct = headers.get('Content-Type') ?? ''
+  if (ct.startsWith('text/html')) {
+    headers.set(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com data:",
+        "img-src 'self' data: https://logo.clearbit.com https://www.google.com https://cdn.simpleicons.org",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join('; '),
+    )
+  }
+  return new Response(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers,
+  })
+}
+
 export default {
-  fetch: app.fetch,
+  async fetch(request: Request, env: Bindings, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url)
+    if (url.pathname.startsWith('/api/')) {
+      return app.fetch(request, env, ctx)
+    }
+    const assetRes = await env.ASSETS.fetch(request)
+    return withSecurityHeaders(assetRes)
+  },
 }

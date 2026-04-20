@@ -29,10 +29,15 @@ tied to a user's stack selection. The realistic threats are:
   Limiting rule for production.
 
 ### Transport
-- **CORS allow-list**: only the origin set by `SITE_URL` in `wrangler.toml`
-  can call the API. All other origins get the browser's default cross-origin
-  block.
-- **Security headers** on every response:
+- **Origin enforcement**: state-changing API requests (`POST /api/subscribe`,
+  etc.) are rejected server-side with `403 Forbidden` when the `Origin` header
+  is missing or does not match `SITE_URL`. CORS headers are layered on top for
+  browser enforcement. Safe methods (`GET`/`HEAD`) are exempt so healthchecks
+  and uptime monitors can probe `/api/health` without an Origin.
+- **Security headers on every response**, including static HTML served from
+  the `ASSETS` binding — the Worker wraps every asset response (`run_worker_first = true`)
+  so the picker's index.html carries CSP + `X-Frame-Options` + friends, not
+  just the API responses:
   - `X-Content-Type-Options: nosniff`
   - `X-Frame-Options: DENY`
   - `Referrer-Policy: strict-origin-when-cross-origin`
