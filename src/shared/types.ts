@@ -7,6 +7,12 @@ export interface StackItem {
   blurb?: string
   /** Homepage URL */
   url?: string
+  /**
+   * Bare hostname used to fetch the tool's logo (e.g. "nextjs.org").
+   * Renderers should fall back to initials when this is missing or the
+   * image fails to load.
+   */
+  domain?: string
 }
 
 export interface StackLayer {

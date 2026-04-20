@@ -12,6 +12,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import type { SelectedStack, StackMode } from '../../shared/types'
 import { ENTRY_NODE, tiersFor } from '../../shared/diagram'
+import ItemLogo from './ItemLogo'
 
 interface Props {
   mode: StackMode
@@ -23,7 +24,7 @@ interface Props {
 type CardNodeData = {
   layerLabel: string
   itemLabel: string
-  initials: string
+  domain?: string
   isEntry?: boolean
 }
 
@@ -67,7 +68,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
       id: ENTRY_NODE.id,
       type: 'card',
       position: { x: entryX, y: cursorY },
-      data: { layerLabel: ENTRY_NODE.layerLabel, itemLabel: ENTRY_NODE.itemLabel, initials: '◑', isEntry: true },
+      data: { layerLabel: ENTRY_NODE.layerLabel, itemLabel: ENTRY_NODE.itemLabel, isEntry: true },
       draggable: false,
       selectable: false,
     })
@@ -76,7 +77,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
   }
 
   for (const tier of tiers) {
-    const rowNodes: { id: string; layer: string; item: string }[] = []
+    const rowNodes: { id: string; layer: string; item: string; domain?: string }[] = []
     for (const layerId of tier.layerIds) {
       const layer = mode.layers.find(l => l.id === layerId)
       if (!layer) continue
@@ -84,7 +85,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
       if (!picked) continue
       const item = layer.items.find(i => i.id === picked)
       if (!item) continue
-      rowNodes.push({ id: `card-${layerId}`, layer: layer.name, item: item.name })
+      rowNodes.push({ id: `card-${layerId}`, layer: layer.name, item: item.name, domain: item.domain })
     }
     if (rowNodes.length === 0) continue
 
@@ -110,7 +111,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
         id: n.id,
         type: 'card',
         position: { x, y: cursorY },
-        data: { layerLabel: n.layer, itemLabel: n.item, initials: getInitials(n.item) },
+        data: { layerLabel: n.layer, itemLabel: n.item, domain: n.domain },
         draggable: false,
         selectable: false,
       })
@@ -142,14 +143,6 @@ function centerOf(ids: string[]): string {
   return ids[Math.floor(ids.length / 2)]
 }
 
-function getInitials(name: string): string {
-  const cleaned = name.replace(/[()]/g, '').trim()
-  const words = cleaned.split(/[\s/.-]+/).filter(Boolean)
-  if (words.length === 0) return '?'
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
-  return (words[0][0] + words[1][0]).toUpperCase()
-}
-
 // ---------- Custom node renderers -----------------------------------------
 
 const CardNode = memo(function CardNode({ data }: NodeProps<Node<CardNodeData, 'card'>>) {
@@ -169,23 +162,13 @@ const CardNode = memo(function CardNode({ data }: NodeProps<Node<CardNodeData, '
       }}
     >
       <Handle type="target" position={Position.Top} style={HANDLE_STYLE} />
-      <div
-        style={{
-          flexShrink: 0,
-          width: 56,
-          height: 56,
-          borderRadius: 12,
-          background: data.isEntry ? '#0a0a0a' : '#ffffff',
-          color: data.isEntry ? '#ffffff' : '#0a0a0a',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: data.initials.length > 1 ? 18 : 24,
-          fontWeight: 800,
-        }}
-      >
-        {data.initials}
-      </div>
+      <ItemLogo
+        name={data.itemLabel}
+        domain={data.domain}
+        size={56}
+        rounded={12}
+        variant={data.isEntry ? 'light-on-dark' : 'dark-on-light'}
+      />
       <div style={{ minWidth: 0, flex: 1 }}>
         <div
           style={{

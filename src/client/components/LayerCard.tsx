@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react'
 import type { StackLayer } from '../../shared/types'
+import ItemLogo from './ItemLogo'
 
 interface Props {
   layer: StackLayer
@@ -44,7 +45,8 @@ export default function LayerCard({ layer, selectedItemId, onToggle }: Props) {
                 item.name
               ) : (
                 <>
-                  <span className="text-sm font-medium">{item.name}</span>
+                  <ItemLogo name={item.name} domain={item.domain} size={24} />
+                  <span className="text-sm font-medium flex-1 text-left">{item.name}</span>
                   <span
                     aria-hidden
                     className={`flex-shrink-0 w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${

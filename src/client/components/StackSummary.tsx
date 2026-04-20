@@ -1,4 +1,5 @@
 import type { SelectedStack, StackMode } from '../../shared/types'
+import ItemLogo from './ItemLogo'
 
 /**
  * Off-screen export target. Rendered wide and landscape for social/slide use.
@@ -10,9 +11,9 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
       const id = selected[l.id]
       if (!id) return null
       const item = l.items.find(i => i.id === id)
-      return item ? { layer: l.name, item: item.name } : null
+      return item ? { layer: l.name, item: item.name, domain: item.domain } : null
     })
-    .filter((x): x is { layer: string; item: string } => !!x)
+    .filter((x): x is NonNullable<typeof x> => !!x)
 
   const kicker = mode.name === 'App Stack' ? '2026 Development Tools' : '2026 Content Operation'
 
@@ -58,7 +59,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
       {/* Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
         {picks.map(p => (
-          <Card key={p.layer} layer={p.layer} item={p.item} />
+          <Card key={p.layer} layer={p.layer} item={p.item} domain={p.domain} />
         ))}
         {picks.length === 0 && (
           <div
@@ -100,8 +101,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
   )
 }
 
-function Card({ layer, item }: { layer: string; item: string }) {
-  const initials = getInitials(item)
+function Card({ layer, item, domain }: { layer: string; item: string; domain?: string }) {
   return (
     <div
       style={{
@@ -114,24 +114,7 @@ function Card({ layer, item }: { layer: string; item: string }) {
         border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      <div
-        style={{
-          flexShrink: 0,
-          width: 64,
-          height: 64,
-          borderRadius: 14,
-          background: '#ffffff',
-          color: '#0a0a0a',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: initials.length > 1 ? 22 : 28,
-          fontWeight: 800,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        {initials}
-      </div>
+      <ItemLogo name={item} domain={domain} size={64} />
       <div style={{ minWidth: 0, flex: 1 }}>
         <div
           style={{
@@ -163,14 +146,3 @@ function Card({ layer, item }: { layer: string; item: string }) {
   )
 }
 
-/** Cheap initials from an item name: up to 2 chars, uppercase. */
-function getInitials(name: string): string {
-  const cleaned = name.replace(/[()]/g, '').trim()
-  const words = cleaned.split(/[\s/.-]+/).filter(Boolean)
-  if (words.length === 0) return '?'
-  if (words.length === 1) {
-    // Single word: first two chars (e.g. "React" -> "Re")
-    return words[0].slice(0, 2).toUpperCase()
-  }
-  return (words[0][0] + words[1][0]).toUpperCase()
-}
