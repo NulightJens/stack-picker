@@ -132,7 +132,9 @@ app.get('/api/health', (c) => c.json({ ok: true }))
 /**
  * GET /api/favicon?domain=<domain>
  *
- * Same-origin proxy for Google's s2/favicons service. Used by ItemLogo as the
+ * Same-origin proxy for favicon.im (which resolves each domain's own
+ * favicon in one hop — no 301 redirect chain, which workerd/wrangler-dev
+ * fetches flake on under concurrent load). Used by ItemLogo as the
  * primary logo source. Proxying (rather than direct <img src>):
  *   - Lets the browser treat the request as same-origin → html-to-image can
  *     embed favicons into exported PNGs without CORS drama.
@@ -164,7 +166,7 @@ app.get('/api/favicon', async (c) => {
   let upstream: Response
   try {
     upstream = await fetch(
-      `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+      `https://favicon.im/${encodeURIComponent(domain)}`,
       { signal: AbortSignal.timeout(5000) },
     )
   } catch {
