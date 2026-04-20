@@ -12,7 +12,10 @@ export default function Nav({ mode, onModeChange, dark, onToggleDark }: Props) {
   return (
     <header className="sticky top-0 z-30 bg-[var(--background)]/90 backdrop-blur border-b border-[var(--border)] safe-area-top">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
-        <a href="/" className="flex items-center gap-2">
+        <a
+          href="https://jensheitmann.com"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
           <span className="text-base font-bold tracking-tight">Jens Heitmann</span>
           <img
             src="/jens-headshot.jpeg"
@@ -20,6 +23,22 @@ export default function Nav({ mode, onModeChange, dark, onToggleDark }: Props) {
             className="h-8 w-8 rounded-full object-cover object-top"
           />
         </a>
+
+        <nav className="hidden sm:flex items-center gap-4 ml-2 text-sm">
+          <a
+            href="https://resources.jensheitmann.com"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            Resources
+          </a>
+          <a
+            href="/"
+            aria-current="page"
+            className="text-[var(--text-primary)] font-semibold"
+          >
+            Stack
+          </a>
+        </nav>
 
         <div className="ml-auto flex items-center gap-1 p-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg">
           <ModeButton active={mode === 'app'} onClick={() => onModeChange('app')}>App</ModeButton>
