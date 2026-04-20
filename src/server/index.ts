@@ -127,6 +127,39 @@ app.use('*', async (c, next) => {
 
 app.get('/api/health', (c) => c.json({ ok: true }))
 
+/**
+ * GET /api/favicon?domain=<domain>
+ *
+ * Same-origin proxy for Google's s2/favicons service. Used by ItemLogo as the
+ * primary logo source. Proxying (rather than direct <img src>):
+ *   - Lets the browser treat the request as same-origin → html-to-image can
+ *     embed favicons into exported PNGs without CORS drama.
+ *   - Edge-caches via Cloudflare's default HTML/image caching, bounded by our
+ *     own `immutable` Cache-Control.
+ *   - Lets us swap the upstream later (Favicon.im, DuckDuckGo, etc.) without
+ *     touching every client call site.
+ *
+ * Domain regex is deliberately strict — no scheme, path, or userinfo — to
+ * prevent SSRF via crafted `?domain=` inputs.
+ */
+app.get('/api/favicon', async (c) => {
+  const domain = c.req.query('domain')
+  if (!domain || !/^[a-z0-9.-]+$/i.test(domain) || domain.length > 253) {
+    return c.json({ error: 'bad domain' }, 400)
+  }
+  const upstream = await fetch(
+    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+  )
+  return new Response(upstream.body, {
+    status: upstream.status,
+    headers: {
+      'Content-Type': upstream.headers.get('Content-Type') ?? 'image/png',
+      'Cache-Control': 'public, max-age=2592000, immutable',
+      'Access-Control-Allow-Origin': '*',
+    },
+  })
+})
+
 /** POST /api/subscribe — store email + stack snapshot, gate downloads */
 app.post('/api/subscribe', async (c) => {
   const ip = c.req.header('CF-Connecting-IP') ?? c.req.header('X-Forwarded-For') ?? 'unknown'
