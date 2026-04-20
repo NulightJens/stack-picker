@@ -81,18 +81,15 @@ export default function App() {
       <Nav mode={mode} onModeChange={setMode} dark={dark} onToggleDark={toggleDark} />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 sm:py-12">
-        <div className="flex items-start gap-3 mb-8 sm:mb-12">
-          <div className="w-12 h-12 rounded-xl bg-[var(--accent)] text-black flex items-center justify-center text-2xl font-black flex-shrink-0">⌘</div>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              2026 {modeData.name === 'App Stack' ? 'Development Tools' : 'Content Operation'}
-            </h1>
-            <p className="text-[var(--text-secondary)] mt-1 text-sm sm:text-base">{modeData.tagline}</p>
-            <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-              <Pill>Single click to select</Pill>
-              <Pill>Click again to deselect</Pill>
-              <Pill>Selections appear in the bottom bar</Pill>
-            </div>
+        <div className="mb-8 sm:mb-12 text-center">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            2026 {modeData.name === 'App Stack' ? 'Development Tools' : 'Content Operation'}
+          </h1>
+          <p className="text-[var(--text-secondary)] mt-2 text-sm sm:text-base">{modeData.tagline}</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-[11px] justify-center">
+            <Pill>Single click to select</Pill>
+            <Pill>Click again to deselect</Pill>
+            <Pill>Selections appear in the bottom bar</Pill>
           </div>
         </div>
 

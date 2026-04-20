@@ -55,7 +55,7 @@ export default function EmailModal({ open, title = 'Enter your email', ctaLabel,
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <div className="w-10 h-10 rounded-xl bg-[var(--accent)] text-black flex items-center justify-center text-[18px] font-black">⌘</div>
+          <img src="/jens-headshot.jpeg" alt="Jens Heitmann" className="h-10 w-10 rounded-full object-cover object-top" />
           <button onClick={onDismiss} aria-label="Close" className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
             <X size={18} />
           </button>
@@ -81,7 +81,7 @@ export default function EmailModal({ open, title = 'Enter your email', ctaLabel,
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-lg bg-[var(--accent)] text-black font-bold text-sm hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-60"
+            className="w-full py-3 rounded-lg bg-[var(--cta)] text-[var(--cta-text)] font-bold text-sm hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-60"
           >
             {submitting ? 'Working…' : ctaLabel}
           </button>

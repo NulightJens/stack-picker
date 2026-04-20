@@ -43,7 +43,7 @@ function ActionBtn({
   primary, danger, onClick, icon, children,
 }: { primary?: boolean; danger?: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode }) {
   const cls = primary
-    ? 'bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)]'
+    ? 'bg-[var(--cta)] text-[var(--cta-text)] hover:bg-[var(--accent-hover)]'
     : danger
       ? 'bg-[var(--background)] text-[var(--danger)] border border-[var(--border)] hover:bg-[var(--surface-hover)]'
       : 'bg-[var(--background)] text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--surface-hover)]'

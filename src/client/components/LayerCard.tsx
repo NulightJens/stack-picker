@@ -13,7 +13,7 @@ export default function LayerCard({ layer, selectedItemId, onToggle }: Props) {
   return (
     <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
       <header className="mb-3">
-        <div className="text-[11px] font-bold tracking-[0.08em] uppercase text-[var(--accent)]">
+        <div className="text-[11px] font-bold tracking-[0.08em] uppercase text-[var(--text-primary)]">
           {layer.name}
         </div>
         <div className="text-xs text-[var(--text-secondary)] mt-0.5">{layer.subtitle}</div>
@@ -30,7 +30,7 @@ export default function LayerCard({ layer, selectedItemId, onToggle }: Props) {
                 isStyle
                   ? `px-3 py-1.5 text-xs font-semibold rounded-full border transition-all ${
                       selected
-                        ? 'border-[var(--accent)] bg-[var(--accent)] text-black'
+                        ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-text)]'
                         : 'border-[var(--border)] bg-[var(--background)] text-[var(--text-primary)] hover:border-[var(--border-strong)]'
                     }`
                   : `group flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border text-left transition-all ${
@@ -51,7 +51,7 @@ export default function LayerCard({ layer, selectedItemId, onToggle }: Props) {
                       selected ? 'border-[var(--accent)] bg-[var(--accent)]' : 'border-[var(--border-strong)]'
                     }`}
                   >
-                    {selected && <Check size={11} strokeWidth={3} className="text-black" />}
+                    {selected && <Check size={11} strokeWidth={3} className="text-[var(--accent-text)]" />}
                   </span>
                 </>
               )}

@@ -13,9 +13,10 @@
   --text-primary: #15171a;
   --text-secondary: #666666;
   --text-muted: #999999;
-  --accent: #10b981;
-  --accent-hover: #059669;
-  --accent-soft: #d1fae5;
+  --accent: #15171a;
+  --accent-hover: #000000;
+  --accent-soft: #f3f4f6;
+  --accent-text: #ffffff;
   --cta: #15171a;
   --cta-text: #ffffff;
   --danger: #ef4444;
@@ -32,9 +33,10 @@
   --text-primary: #fafafa;
   --text-secondary: #a0a0a0;
   --text-muted: #666666;
-  --accent: #10b981;
-  --accent-hover: #34d399;
-  --accent-soft: #064e3b;
+  --accent: #fafafa;
+  --accent-hover: #ffffff;
+  --accent-soft: #1a1a1a;
+  --accent-text: #0a0a0a;
   --cta: #fafafa;
   --cta-text: #0a0a0a;
   --danger: #f87171;

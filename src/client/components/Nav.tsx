@@ -10,11 +10,15 @@ interface Props {
 
 export default function Nav({ mode, onModeChange, dark, onToggleDark }: Props) {
   return (
-    <header className="sticky top-0 z-30 bg-[var(--background)]/90 backdrop-blur border-b border-[var(--border)]">
+    <header className="sticky top-0 z-30 bg-[var(--background)]/90 backdrop-blur border-b border-[var(--border)] safe-area-top">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
-        <a href="/" className="flex items-center gap-2 font-extrabold text-sm tracking-tight">
-          <span className="w-7 h-7 rounded-md bg-[var(--accent)] text-black flex items-center justify-center text-[15px] font-black">⌘</span>
-          <span>Stack Picker</span>
+        <a href="/" className="flex items-center gap-2">
+          <span className="text-base font-bold tracking-tight">Jens Heitmann</span>
+          <img
+            src="/jens-headshot.jpeg"
+            alt="Jens Heitmann"
+            className="h-8 w-8 rounded-full object-cover object-top"
+          />
         </a>
 
         <div className="ml-auto flex items-center gap-1 p-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg">
