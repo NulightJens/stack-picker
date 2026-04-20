@@ -1,5 +1,6 @@
 import type { SelectedStack, StackMode } from '../../shared/types'
 import DiagramCanvas, { DIAGRAM_WIDTH } from './DiagramCanvas'
+import { SITE } from '../../../config/site'
 
 /**
  * Off-screen render target used to produce the diagram PNG. Wraps the
@@ -66,9 +67,9 @@ export default function DiagramExportFrame({ mode, selected }: { mode: StackMode
         <div>
           {pickedCount} {pickedCount === 1 ? 'layer' : 'layers'}
           <span style={{ margin: '0 10px', color: '#333' }}>·</span>
-          stack.jensheitmann.com
+          {SITE.meta.domain}
         </div>
-        <div style={{ fontWeight: 700, color: '#888' }}>Jens Heitmann</div>
+        <div style={{ fontWeight: 700, color: '#888' }}>{SITE.meta.wordmark ?? SITE.brand.name}</div>
       </div>
     </div>
   )

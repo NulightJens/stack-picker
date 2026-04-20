@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
+import { SITE } from '../../../config/site'
 
 export interface EmailModalProps {
   open: boolean
@@ -55,7 +56,13 @@ export default function EmailModal({ open, title = 'Enter your email', ctaLabel,
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <img src="/jens-headshot.jpeg" alt="Jens Heitmann" className="h-10 w-10 rounded-full object-cover object-top" />
+          {SITE.brand.avatarSrc ? (
+            <img src={SITE.brand.avatarSrc} alt={SITE.brand.name} className="h-10 w-10 rounded-full object-cover object-top" />
+          ) : (
+            <div className="h-10 w-10 rounded-xl bg-[var(--cta)] text-[var(--cta-text)] flex items-center justify-center text-sm font-bold">
+              {SITE.brand.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}
+            </div>
+          )}
           <button onClick={onDismiss} aria-label="Close" className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
             <X size={18} />
           </button>

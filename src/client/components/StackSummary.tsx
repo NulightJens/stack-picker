@@ -1,5 +1,6 @@
 import type { SelectedStack, StackMode } from '../../shared/types'
 import ItemLogo from './ItemLogo'
+import { SITE } from '../../../config/site'
 
 /**
  * Off-screen export target. Rendered wide and landscape for social/slide use.
@@ -93,9 +94,9 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
         <div>
           {picks.length} {picks.length === 1 ? 'layer' : 'layers'}
           <span style={{ margin: '0 10px', color: '#333' }}>·</span>
-          stack.jensheitmann.com
+          {SITE.meta.domain}
         </div>
-        <div style={{ fontWeight: 700, color: '#888' }}>Jens Heitmann</div>
+        <div style={{ fontWeight: 700, color: '#888' }}>{SITE.meta.wordmark ?? SITE.brand.name}</div>
       </div>
     </div>
   )

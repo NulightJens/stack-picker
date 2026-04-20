@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Nav from './components/Nav'
 import LayerCard from './components/LayerCard'
 import BottomBar, { type BottomAction } from './components/BottomBar'
@@ -10,6 +10,7 @@ import { useStack } from './hooks/useStack'
 import { getMode } from '../shared/data'
 import { getStoredEmail, setStoredEmail, subscribe } from './lib/api'
 import { copyPromptToClipboard, copyStackImage, downloadPng } from './lib/export'
+import { SITE } from '../../config/site'
 
 const ACTION_CTA: Record<BottomAction, string> = {
   copy_prompt: 'Copy prompt',
@@ -23,6 +24,12 @@ export default function App() {
   const [dark, toggleDark] = useDarkMode()
   const { mode, selected, setMode, toggle, reset, pickedCount } = useStack()
   const modeData = getMode(mode)
+
+  useEffect(() => {
+    document.title = SITE.meta.title
+    const description = document.querySelector('meta[name="description"]')
+    if (description && SITE.meta.description) description.setAttribute('content', SITE.meta.description)
+  }, [])
   const exportRef = useRef<HTMLDivElement>(null)
   const diagramRef = useRef<HTMLDivElement>(null)
 

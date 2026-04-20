@@ -15,4 +15,11 @@ database_name = "stack-picker-db"
 database_id = "REPLACE_AFTER_WRANGLER_D1_CREATE"
 
 [vars]
-SITE_URL = "https://stack.jensheitmann.com"
+# Set to your deployed origin — used by the Worker's CORS allow-list.
+SITE_URL = "https://stack.example.com"
+
+# ---------- Optional: hardened security ----------
+# Uncomment after running `wrangler secret put ADMIN_TOKEN` if you want
+# to add an admin-only endpoint later.
+# [secrets]
+# ADMIN_TOKEN = "..."
