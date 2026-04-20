@@ -8,22 +8,27 @@ export async function copyPromptToClipboard(mode: StackMode, selected: SelectedS
 }
 
 /**
- * Render a node to a PNG blob. html-to-image throws a CORS SecurityError when
- * it tries to inline cross-origin stylesheets (e.g. Google Fonts); once that
- * path throws, the whole render aborts. Retry without font embedding — the
- * PNG loses its font-face definitions but the browser's system fallback
- * stack picks a close enough match for export purposes.
+ * Render a node to a PNG blob.
+ *
+ * html-to-image walks every <link rel="stylesheet"> on the page to inline
+ * @font-face rules. Google Fonts is cross-origin, so reading .cssRules throws
+ * SecurityError and aborts the whole render. Passing an empty `fontEmbedCSS`
+ * short-circuits the font-parsing path entirely — the exported PNG uses the
+ * element's resolved font stack (Manrope → system-ui fallback), which is
+ * fine for the PNG at the sizes we export.
+ *
+ * `skipFonts: true` exists in html-to-image's types but the current release
+ * still enters the CSS parser; `fontEmbedCSS: ''` is the reliable escape
+ * hatch across versions.
  */
 async function renderPng(node: HTMLElement): Promise<Blob> {
-  try {
-    const blob = await toBlob(node, { cacheBust: true, pixelRatio: 2 })
-    if (blob) return blob
-  } catch (err) {
-    if (import.meta.env.DEV) console.warn('[export] full render failed, retrying without fonts', err)
-  }
-  const fallback = await toBlob(node, { cacheBust: true, pixelRatio: 2, skipFonts: true })
-  if (!fallback) throw new Error('Could not render image')
-  return fallback
+  const blob = await toBlob(node, {
+    cacheBust: true,
+    pixelRatio: 2,
+    fontEmbedCSS: '',
+  })
+  if (!blob) throw new Error('Could not render image')
+  return blob
 }
 
 /**
