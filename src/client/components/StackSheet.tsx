@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Copy, Download, Image as ImageIcon, RotateCcw, FileCode, X } from 'lucide-react'
 import type { SelectedStack, StackMode } from '../../shared/types'
 import ItemLogo from './ItemLogo'
@@ -32,6 +32,24 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
     [mode, selected],
   )
 
+  const [dragY, setDragY] = useState(0)
+  const dragStartY = useRef<number | null>(null)
+  const dragging = useRef(false)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onOpenChange(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onOpenChange])
+
+  // Reset drag offset every time the sheet re-opens.
+  useEffect(() => {
+    if (open) setDragY(0)
+  }, [open])
+
   if (!open) return null
 
   const fire = (a: BottomAction) => {
@@ -49,25 +67,55 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
 
       {/* Sheet */}
       <div
-        className="absolute left-0 right-0 bottom-0 bg-[var(--surface)] rounded-t-2xl shadow-2xl border-t border-[var(--border)] flex flex-col"
-        style={{ maxHeight: '85vh', paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="absolute left-0 right-0 bottom-0 bg-[var(--surface)] rounded-t-2xl shadow-2xl border-t border-[var(--border)] flex flex-col sheet-slide"
+        style={{
+          maxHeight: '85vh',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+          transition: dragging.current ? 'none' : undefined,
+          touchAction: 'pan-y',
+        }}
+        onPointerDown={e => {
+          // Only start drag if the gesture begins on the drag handle OR the header
+          // — not on the scrolling pick list (or the action buttons below it).
+          const target = e.target as HTMLElement
+          if (!target.closest('[data-sheet-grip]')) return
+          dragging.current = true
+          dragStartY.current = e.clientY
+          ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+        }}
+        onPointerMove={e => {
+          if (!dragging.current || dragStartY.current == null) return
+          const delta = e.clientY - dragStartY.current
+          setDragY(Math.max(0, delta))
+        }}
+        onPointerUp={e => {
+          if (!dragging.current) return
+          dragging.current = false
+          dragStartY.current = null
+          ;(e.target as HTMLElement).releasePointerCapture?.(e.pointerId)
+          if (dragY > 80) onOpenChange(false)
+          else setDragY(0)
+        }}
       >
-        <div className="flex flex-col items-center pt-2 pb-1">
-          <div className="w-10 h-1 rounded-full bg-[var(--border-strong)]" aria-hidden />
-        </div>
+        <div data-sheet-grip>
+          <div className="flex flex-col items-center pt-2 pb-1">
+            <div className="w-10 h-1 rounded-full bg-[var(--border-strong)]" aria-hidden />
+          </div>
 
-        <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
-          <h2 id="stack-sheet-title" className="text-[11px] font-bold tracking-[0.08em] uppercase text-[var(--text-primary)]">
-            Your stack ({picks.length})
-          </h2>
-          <button
-            onClick={() => onOpenChange(false)}
-            aria-label="Close stack sheet"
-            className="p-1 rounded hover:bg-[var(--surface-hover)]"
-          >
-            <X size={18} />
-          </button>
-        </header>
+          <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
+            <h2 id="stack-sheet-title" className="text-[11px] font-bold tracking-[0.08em] uppercase text-[var(--text-primary)]">
+              Your stack ({picks.length})
+            </h2>
+            <button
+              onClick={() => onOpenChange(false)}
+              aria-label="Close stack sheet"
+              className="p-1 rounded hover:bg-[var(--surface-hover)]"
+            >
+              <X size={18} />
+            </button>
+          </header>
+        </div>
 
         {/* Pick list */}
         <ul className="overflow-y-auto px-2 py-2" style={{ maxHeight: '60vh' }}>
