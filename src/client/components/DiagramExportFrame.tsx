@@ -4,8 +4,7 @@ import { SITE } from '../../../config/site'
 
 /**
  * Off-screen render target used to produce the diagram PNG. Wraps the
- * React-Flow-based DiagramCanvas with a titled frame matching the site's
- * monochrome style.
+ * DiagramCanvas with a titled frame matching the site's monochrome style.
  */
 export default function DiagramExportFrame({ mode, selected }: { mode: StackMode; selected: SelectedStack }) {
   const pickedCount = Object.values(selected).filter(Boolean).length
