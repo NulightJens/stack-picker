@@ -1,4 +1,5 @@
 .superpowers/
+.planning/
 node_modules/
 dist/
 .wrangler/
