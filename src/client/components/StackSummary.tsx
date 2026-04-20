@@ -11,7 +11,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
       const id = selected[l.id]
       if (!id) return null
       const item = l.items.find(i => i.id === id)
-      return item ? { layer: l.name, item: item.name, domain: item.domain } : null
+      return item ? { layer: l.name, item: item.name, domain: item.domain, itemId: item.id } : null
     })
     .filter((x): x is NonNullable<typeof x> => !!x)
 
@@ -59,7 +59,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
       {/* Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
         {picks.map(p => (
-          <Card key={p.layer} layer={p.layer} item={p.item} domain={p.domain} />
+          <Card key={p.layer} layer={p.layer} item={p.item} domain={p.domain} itemId={p.itemId} />
         ))}
         {picks.length === 0 && (
           <div
@@ -101,7 +101,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
   )
 }
 
-function Card({ layer, item, domain }: { layer: string; item: string; domain?: string }) {
+function Card({ layer, item, domain, itemId }: { layer: string; item: string; domain?: string; itemId?: string }) {
   return (
     <div
       style={{
@@ -114,7 +114,7 @@ function Card({ layer, item, domain }: { layer: string; item: string; domain?: s
         border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      <ItemLogo name={item} domain={domain} size={64} />
+      <ItemLogo name={item} domain={domain} itemId={itemId} size={64} />
       <div style={{ minWidth: 0, flex: 1 }}>
         <div
           style={{

@@ -45,7 +45,7 @@ export default function LayerCard({ layer, selectedItemId, onToggle }: Props) {
                 item.name
               ) : (
                 <>
-                  <ItemLogo name={item.name} domain={item.domain} size={24} />
+                  <ItemLogo name={item.name} domain={item.domain} itemId={item.id} size={24} />
                   <span className="text-sm font-medium flex-1 text-left">{item.name}</span>
                   <span
                     aria-hidden

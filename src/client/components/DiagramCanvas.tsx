@@ -25,6 +25,7 @@ type CardNodeData = {
   layerLabel: string
   itemLabel: string
   domain?: string
+  itemId?: string
   isEntry?: boolean
 }
 
@@ -77,7 +78,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
   }
 
   for (const tier of tiers) {
-    const rowNodes: { id: string; layer: string; item: string; domain?: string }[] = []
+    const rowNodes: { id: string; layer: string; item: string; domain?: string; itemId: string }[] = []
     for (const layerId of tier.layerIds) {
       const layer = mode.layers.find(l => l.id === layerId)
       if (!layer) continue
@@ -85,7 +86,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
       if (!picked) continue
       const item = layer.items.find(i => i.id === picked)
       if (!item) continue
-      rowNodes.push({ id: `card-${layerId}`, layer: layer.name, item: item.name, domain: item.domain })
+      rowNodes.push({ id: `card-${layerId}`, layer: layer.name, item: item.name, domain: item.domain, itemId: item.id })
     }
     if (rowNodes.length === 0) continue
 
@@ -111,7 +112,7 @@ function buildGraph(mode: StackMode, selected: SelectedStack) {
         id: n.id,
         type: 'card',
         position: { x, y: cursorY },
-        data: { layerLabel: n.layer, itemLabel: n.item, domain: n.domain },
+        data: { layerLabel: n.layer, itemLabel: n.item, domain: n.domain, itemId: n.itemId },
         draggable: false,
         selectable: false,
       })
@@ -165,6 +166,7 @@ const CardNode = memo(function CardNode({ data }: NodeProps<Node<CardNodeData, '
       <ItemLogo
         name={data.itemLabel}
         domain={data.domain}
+        itemId={data.itemId}
         size={56}
         rounded={12}
         variant={data.isEntry ? 'light-on-dark' : 'dark-on-light'}

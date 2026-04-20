@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { initialsFor, logoFallbackUrl, logoUrl } from '../../shared/icons'
+import { ICON_SLUGS, simpleIconUrl } from '../../shared/iconSlugs'
 
 type Variant = 'light-on-dark' | 'dark-on-light'
+type Stage = 'clearbit' | 'favicon' | 'simpleicons' | 'initials'
 
 interface Props {
   name: string
   domain?: string
+  /** Our internal item id — used to look up a Simple Icons slug. */
+  itemId?: string
   size: number
   rounded?: number
   /**
@@ -18,14 +22,28 @@ interface Props {
 }
 
 /**
- * Renders the tool's logo fetched from Clearbit with a Google-favicon fallback.
- * When both fail (or when no domain is known) we show a monogram tile.
+ * Fallback chain for rendering a tool's logo:
+ *   1. Clearbit brand API (full-color brand logo)
+ *   2. Google favicon (reliable but low-fi)
+ *   3. Simple Icons CDN (clean monochrome brand SVG)
+ *   4. Initials monogram tile
  */
-export default function ItemLogo({ name, domain, size, rounded, variant = 'dark-on-light' }: Props) {
-  const [stage, setStage] = useState<'primary' | 'fallback' | 'initials'>(domain ? 'primary' : 'initials')
+export default function ItemLogo({ name, domain, itemId, size, rounded, variant = 'dark-on-light' }: Props) {
+  const slug = itemId ? ICON_SLUGS[itemId] : undefined
+  const initialStage: Stage = domain ? 'clearbit' : slug ? 'simpleicons' : 'initials'
+  const [stage, setStage] = useState<Stage>(initialStage)
   const radius = rounded ?? Math.round(size * 0.22)
 
-  if (stage === 'initials' || !domain) {
+  const advance = () => {
+    setStage(prev => {
+      if (prev === 'clearbit') return 'favicon'
+      if (prev === 'favicon') return slug ? 'simpleicons' : 'initials'
+      if (prev === 'simpleicons') return 'initials'
+      return 'initials'
+    })
+  }
+
+  if (stage === 'initials') {
     return (
       <div
         aria-hidden
@@ -50,7 +68,10 @@ export default function ItemLogo({ name, domain, size, rounded, variant = 'dark-
     )
   }
 
-  const src = stage === 'primary' ? logoUrl(domain, size * 2) : logoFallbackUrl(domain, size * 2)
+  let src = ''
+  if (stage === 'clearbit' && domain) src = logoUrl(domain, size * 2)
+  else if (stage === 'favicon' && domain) src = logoFallbackUrl(domain, size * 2)
+  else if (stage === 'simpleicons' && slug) src = simpleIconUrl(slug)
 
   return (
     <img
@@ -68,7 +89,7 @@ export default function ItemLogo({ name, domain, size, rounded, variant = 'dark-
         background: '#ffffff',
         padding: Math.max(2, Math.round(size * 0.08)),
       }}
-      onError={() => setStage(stage === 'primary' ? 'fallback' : 'initials')}
+      onError={advance}
     />
   )
 }
