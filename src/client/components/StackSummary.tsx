@@ -4,7 +4,8 @@ import { SITE } from '../../../config/site'
 
 /**
  * Off-screen export target. Rendered wide and landscape for social/slide use.
- * Monochrome palette — dark charcoal bg, white text, neutral gray accents.
+ * Theme-aware — inherits the site's current light/dark palette via CSS vars
+ * cascading from the `.dark` class on `<html>`.
  */
 export default function StackSummary({ mode, selected }: { mode: StackMode; selected: SelectedStack }) {
   const picks = mode.layers
@@ -24,9 +25,8 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
       style={{
         width: 1400,
         padding: 72,
-        background:
-          'radial-gradient(ellipse 800px 500px at 80% 0%, rgba(255,255,255,0.04), transparent 70%), #0a0a0a',
-        color: '#fafafa',
+        background: 'var(--background)',
+        color: 'var(--text-primary)',
         fontFamily: 'Manrope, sans-serif',
       }}
     >
@@ -38,7 +38,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: '#888',
+            color: 'var(--text-muted)',
             marginBottom: 12,
           }}
         >
@@ -50,7 +50,7 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
             fontWeight: 800,
             letterSpacing: '-0.035em',
             lineHeight: 1,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
           }}
         >
           My 2026 Stack
@@ -68,9 +68,9 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
               gridColumn: '1 / -1',
               padding: 48,
               textAlign: 'center',
-              color: '#666',
+              color: 'var(--text-muted)',
               fontSize: 18,
-              border: '1px dashed #222',
+              border: '1px dashed var(--border)',
               borderRadius: 14,
             }}
           >
@@ -87,16 +87,18 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
           justifyContent: 'space-between',
           alignItems: 'center',
           fontSize: 14,
-          color: '#555',
+          color: 'var(--text-muted)',
           letterSpacing: '0.02em',
         }}
       >
         <div>
           {picks.length} {picks.length === 1 ? 'layer' : 'layers'}
-          <span style={{ margin: '0 10px', color: '#333' }}>·</span>
+          <span style={{ margin: '0 10px', color: 'var(--border-strong)' }}>·</span>
           {SITE.meta.domain}
         </div>
-        <div style={{ fontWeight: 700, color: '#888' }}>{SITE.meta.wordmark ?? SITE.brand.name}</div>
+        <div style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>
+          {SITE.meta.wordmark ?? SITE.brand.name}
+        </div>
       </div>
     </div>
   )
@@ -111,8 +113,8 @@ function Card({ layer, item, domain, itemId }: { layer: string; item: string; do
         gap: 20,
         padding: '22px 24px',
         borderRadius: 14,
-        background: '#141414',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
       }}
     >
       <ItemLogo name={item} domain={domain} itemId={itemId} size={64} />
@@ -123,7 +125,7 @@ function Card({ layer, item, domain, itemId }: { layer: string; item: string; do
             fontWeight: 700,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: '#888',
+            color: 'var(--text-muted)',
             marginBottom: 4,
           }}
         >
@@ -134,7 +136,7 @@ function Card({ layer, item, domain, itemId }: { layer: string; item: string; do
             fontSize: 28,
             fontWeight: 800,
             letterSpacing: '-0.02em',
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',

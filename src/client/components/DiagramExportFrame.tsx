@@ -16,9 +16,8 @@ export default function DiagramExportFrame({ mode, selected }: { mode: StackMode
       style={{
         width: DIAGRAM_WIDTH + 144,
         padding: 72,
-        background:
-          'radial-gradient(ellipse 800px 500px at 80% 0%, rgba(255,255,255,0.04), transparent 70%), #0a0a0a',
-        color: '#fafafa',
+        background: 'var(--background)',
+        color: 'var(--text-primary)',
         fontFamily: 'Manrope, sans-serif',
       }}
     >
@@ -30,7 +29,7 @@ export default function DiagramExportFrame({ mode, selected }: { mode: StackMode
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: '#888',
+            color: 'var(--text-muted)',
             marginBottom: 10,
           }}
         >
@@ -42,7 +41,7 @@ export default function DiagramExportFrame({ mode, selected }: { mode: StackMode
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
           }}
         >
           My 2026 {mode.name === 'App Stack' ? 'Stack' : 'Content Operation'}
@@ -60,15 +59,17 @@ export default function DiagramExportFrame({ mode, selected }: { mode: StackMode
           justifyContent: 'space-between',
           alignItems: 'center',
           fontSize: 13,
-          color: '#555',
+          color: 'var(--text-muted)',
         }}
       >
         <div>
           {pickedCount} {pickedCount === 1 ? 'layer' : 'layers'}
-          <span style={{ margin: '0 10px', color: '#333' }}>·</span>
+          <span style={{ margin: '0 10px', color: 'var(--border-strong)' }}>·</span>
           {SITE.meta.domain}
         </div>
-        <div style={{ fontWeight: 700, color: '#888' }}>{SITE.meta.wordmark ?? SITE.brand.name}</div>
+        <div style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>
+          {SITE.meta.wordmark ?? SITE.brand.name}
+        </div>
       </div>
     </div>
   )

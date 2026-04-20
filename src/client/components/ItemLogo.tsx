@@ -1,49 +1,73 @@
-import { useState } from 'react'
-import { initialsFor, logoFallbackUrl, logoUrl } from '../../shared/icons'
+import { useState, useSyncExternalStore } from 'react'
+import { initialsFor } from '../../shared/icons'
 import { ICON_SLUGS, simpleIconUrl } from '../../shared/iconSlugs'
 
-type Variant = 'light-on-dark' | 'dark-on-light'
-type Stage = 'clearbit' | 'favicon' | 'simpleicons' | 'initials'
+type Stage = 'simpleicons' | 'initials'
 
 interface Props {
   name: string
+  /** Retained for compatibility with existing callers; unused — logos come
+      from the Simple Icons slug map, not from item domains. */
   domain?: string
-  /** Our internal item id — used to look up a Simple Icons slug. */
+  /** Our internal item id — looked up in ICON_SLUGS to get a Simple Icons slug. */
   itemId?: string
   size: number
   rounded?: number
-  /**
-   * "dark-on-light" — white tile with dark initials (default, matches cards on
-   *   light bg and the inverted cards in dark mode).
-   * "light-on-dark" — dark tile with light initials (for use on white bg in
-   *   exports).
-   */
-  variant?: Variant
+  /** True when this logo sits on a card whose bg is inverted relative to the
+      page theme (e.g. the Entry node in the system diagram). Flips the tile
+      colors so the logo always contrasts with its immediate surface. */
+  inverted?: boolean
 }
 
 /**
- * Fallback chain for rendering a tool's logo:
- *   1. Clearbit brand API (full-color brand logo)
- *   2. Google favicon (reliable but low-fi)
- *   3. Simple Icons CDN (clean monochrome brand SVG)
- *   4. Initials monogram tile
+ * Theme-reactive — subscribes to `class` changes on `<html>` so the logo
+ * tile flips live when the user toggles dark mode. Safe during SSR.
  */
-export default function ItemLogo({ name, domain, itemId, size, rounded, variant = 'dark-on-light' }: Props) {
+function useIsDark(): boolean {
+  return useSyncExternalStore(
+    onChange => {
+      if (typeof document === 'undefined') return () => {}
+      const obs = new MutationObserver(onChange)
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+      return () => obs.disconnect()
+    },
+    () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'),
+    () => false,
+  )
+}
+
+/**
+ * Logo rendering strategy:
+ *   1. Simple Icons CDN (clean monochrome brand SVG) — CORS-clean, exports
+ *      cleanly to PNG because html-to-image can fetch it without taint.
+ *   2. Initials monogram tile (fallback for items with no slug or a 404).
+ *
+ * Tile colors track the current theme via `useIsDark()` so the same component
+ * renders cleanly in both light and dark exports. The logo SVG is forced to a
+ * monochrome hex that contrasts with the tile, which also matches the site's
+ * editorial monochrome aesthetic (brand colors were never a goal).
+ */
+export default function ItemLogo({ name, itemId, size, rounded, inverted = false }: Props) {
   const slug = itemId ? ICON_SLUGS[itemId] : undefined
-  const initialStage: Stage = domain ? 'clearbit' : slug ? 'simpleicons' : 'initials'
+  const initialStage: Stage = slug ? 'simpleicons' : 'initials'
   const [stage, setStage] = useState<Stage>(initialStage)
   const radius = rounded ?? Math.round(size * 0.22)
+  const isDark = useIsDark()
 
-  const advance = () => {
-    setStage(prev => {
-      if (prev === 'clearbit') return 'favicon'
-      if (prev === 'favicon') return slug ? 'simpleicons' : 'initials'
-      if (prev === 'simpleicons') return 'initials'
-      return 'initials'
-    })
-  }
+  // Regular cards track page theme; inverted cards flip vs page.
+  // The tile should always be the inverse of its card so the logo stands out.
+  //   - dark mode, not inverted: card dark → tile light
+  //   - dark mode, inverted    : card light → tile dark
+  //   - light mode, not inverted: card light → tile dark
+  //   - light mode, inverted   : card dark → tile light
+  const tileIsLight = inverted ? !isDark : isDark
+  const tileBg = tileIsLight ? '#ffffff' : '#15171a'
+  const tileFg = tileIsLight ? '#0a0a0a' : '#ffffff'
+  // Simple Icons CDN accepts `/<slug>/<hex>` to force the icon color — we strip
+  // the leading `#` so both 6-char and plain strings work.
+  const iconHex = tileIsLight ? '0a0a0a' : 'ffffff'
 
-  if (stage === 'initials') {
+  if (stage === 'initials' || !slug) {
     return (
       <div
         aria-hidden
@@ -52,8 +76,8 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, variant 
           height: size,
           flexShrink: 0,
           borderRadius: radius,
-          background: variant === 'light-on-dark' ? '#0a0a0a' : '#ffffff',
-          color: variant === 'light-on-dark' ? '#ffffff' : '#0a0a0a',
+          background: tileBg,
+          color: tileFg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -68,28 +92,24 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, variant 
     )
   }
 
-  let src = ''
-  if (stage === 'clearbit' && domain) src = logoUrl(domain, size * 2)
-  else if (stage === 'favicon' && domain) src = logoFallbackUrl(domain, size * 2)
-  else if (stage === 'simpleicons' && slug) src = simpleIconUrl(slug)
-
   return (
     <img
-      src={src}
+      src={simpleIconUrl(slug, iconHex)}
       alt={name}
       width={size}
       height={size}
       loading="lazy"
+      crossOrigin="anonymous"
       style={{
         width: size,
         height: size,
         flexShrink: 0,
         borderRadius: radius,
         objectFit: 'contain',
-        background: '#ffffff',
+        background: tileBg,
         padding: Math.max(2, Math.round(size * 0.08)),
       }}
-      onError={advance}
+      onError={() => setStage('initials')}
     />
   )
 }

@@ -87,9 +87,11 @@ const Card = memo(function Card({ pick }: { pick: Pick }) {
         gap: 16,
         padding: '14px 18px',
         borderRadius: 14,
-        background: isEntry ? '#ffffff' : '#141414',
-        border: isEntry ? '1px solid #ffffff' : '1px solid rgba(255,255,255,0.08)',
-        color: isEntry ? '#0a0a0a' : '#fafafa',
+        // Entry node inverts vs the page theme (accent bg + accent-text text).
+        // Regular cards track the page theme via surface.
+        background: isEntry ? 'var(--accent)' : 'var(--surface)',
+        border: `1px solid ${isEntry ? 'var(--accent)' : 'var(--border)'}`,
+        color: isEntry ? 'var(--accent-text)' : 'var(--text-primary)',
         flexShrink: 0,
         boxSizing: 'border-box',
       }}
@@ -100,7 +102,7 @@ const Card = memo(function Card({ pick }: { pick: Pick }) {
         itemId={pick.itemId}
         size={56}
         rounded={12}
-        variant={isEntry ? 'light-on-dark' : 'dark-on-light'}
+        inverted={isEntry}
       />
       <div style={{ minWidth: 0, flex: 1 }}>
         <div
@@ -109,7 +111,7 @@ const Card = memo(function Card({ pick }: { pick: Pick }) {
             fontWeight: 700,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: isEntry ? '#666' : '#888',
+            color: 'var(--text-muted)',
             marginBottom: 2,
           }}
         >
@@ -136,7 +138,7 @@ function TierBlock({ block }: { block: TierBlockData }) {
   return (
     <div
       style={{
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid var(--border)',
         borderRadius: 18,
         padding: '24px 36px 32px',
         boxSizing: 'border-box',
@@ -148,7 +150,7 @@ function TierBlock({ block }: { block: TierBlockData }) {
           fontWeight: 700,
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
-          color: '#888',
+          color: 'var(--text-muted)',
           marginBottom: 20,
         }}
       >

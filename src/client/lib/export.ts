@@ -21,11 +21,17 @@ export async function copyPromptToClipboard(mode: StackMode, selected: SelectedS
  * still enters the CSS parser; `fontEmbedCSS: ''` is the reliable escape
  * hatch across versions.
  */
+/** 1×1 transparent PNG — swapped in when a cross-origin image fetch fails
+    so the broken-img case can't cascade into a full render rejection. */
+const IMAGE_PLACEHOLDER =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+
 async function renderPng(node: HTMLElement): Promise<Blob> {
   const blob = await toBlob(node, {
     cacheBust: true,
     pixelRatio: 2,
     fontEmbedCSS: '',
+    imagePlaceholder: IMAGE_PLACEHOLDER,
   })
   if (!blob) throw new Error('Could not render image')
   return blob

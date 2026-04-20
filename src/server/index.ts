@@ -111,8 +111,8 @@ app.use('*', async (c, next) => {
         "script-src 'self'",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com data:",
-        // Brand logos pulled via Clearbit, Google favicons, and Simple Icons CDN
-        "img-src 'self' data: https://logo.clearbit.com https://www.google.com https://cdn.simpleicons.org",
+        // Brand logos come from the Simple Icons CDN (CORS-clean SVGs).
+        "img-src 'self' data: https://cdn.simpleicons.org",
         "connect-src 'self'",
         "frame-ancestors 'none'",
         "base-uri 'self'",
