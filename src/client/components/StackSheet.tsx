@@ -72,7 +72,6 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
           maxHeight: '85vh',
           paddingBottom: 'env(safe-area-inset-bottom)',
           transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
-          transition: dragging.current ? 'none' : undefined,
           touchAction: 'pan-y',
         }}
         onPointerDown={e => {
@@ -96,6 +95,13 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
           ;(e.target as HTMLElement).releasePointerCapture?.(e.pointerId)
           if (dragY > 80) onOpenChange(false)
           else setDragY(0)
+        }}
+        onPointerCancel={e => {
+          if (!dragging.current) return
+          dragging.current = false
+          dragStartY.current = null
+          ;(e.target as HTMLElement).releasePointerCapture?.(e.pointerId)
+          setDragY(0)
         }}
       >
         <div data-sheet-grip>
