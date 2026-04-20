@@ -213,11 +213,14 @@ function HoverStrip({
               </div>
             ))}
             {overflow > 0 && (
-              <div className="ml-1.5 h-6 px-2 rounded-full bg-[var(--background)] border border-[var(--border)] flex items-center text-[11px] font-semibold text-[var(--text-secondary)]">
+              <div
+                className="ml-1.5 h-6 px-2 rounded-full bg-[var(--background)] border border-[var(--border)] flex items-center text-[11px] font-semibold text-[var(--text-secondary)]"
+                style={{ zIndex: 90 }}
+              >
                 +{overflow} more
               </div>
             )}
-            <span className="ml-2 text-[11px] text-[var(--text-muted)]">(hover to see all)</span>
+            <span className="ml-2 text-[11px] text-[var(--text-muted)] hidden sm:inline">(hover to see all)</span>
           </div>
         )}
 
