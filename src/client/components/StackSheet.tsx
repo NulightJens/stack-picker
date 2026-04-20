@@ -104,7 +104,7 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="stack-sheet-title" id="stack-sheet">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/35"
+        className="absolute inset-0 bg-black/35 sheet-backdrop"
         onClick={() => onOpenChange(false)}
       />
 

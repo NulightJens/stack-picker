@@ -61,3 +61,28 @@ body {
 
 /* Hide scrollbars inside the mockup during PNG export */
 [data-export-root] { background: var(--background); }
+
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes sheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sheet-slide {
+  animation: sheet-slide-up 220ms ease-out;
+}
+
+.sheet-backdrop {
+  animation: sheet-fade-in 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-slide,
+  .sheet-backdrop {
+    animation: none !important;
+  }
+}
