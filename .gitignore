@@ -5,3 +5,9 @@ dist/
 .env
 .env.local
 .dev.vars
+
+# Personal branding — forkers edit their own local copy. Example in config/site.example.ts.
+config/site.ts
+
+# Personal assets (avatar images, private copies, etc.) live here and never commit.
+public/private/

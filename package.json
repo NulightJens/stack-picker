@@ -4,12 +4,14 @@
   "description": "Interactive tech-stack picker — build your stack, ship it.",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/init-config.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "db:migrate": "wrangler d1 execute stack-picker-db --local --file=migrations/0001_initial.sql",
     "db:migrate:remote": "wrangler d1 execute stack-picker-db --remote --file=migrations/0001_initial.sql",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
