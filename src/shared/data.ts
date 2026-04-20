@@ -182,6 +182,37 @@ export const APP_MODE: StackMode = {
         { id: 'groq', name: 'Groq' },
       ],
     },
+    {
+      id: 'search', name: 'Search', subtitle: 'Find stuff fast',
+      items: [
+        { id: 'algolia', name: 'Algolia' },
+        { id: 'meilisearch', name: 'Meilisearch' },
+        { id: 'typesense', name: 'Typesense' },
+        { id: 'elastic', name: 'Elastic' },
+        { id: 'postgres-fts', name: 'Postgres FTS' },
+      ],
+    },
+    {
+      id: 'cms', name: 'CMS / Content', subtitle: 'Marketing & blog',
+      items: [
+        { id: 'sanity', name: 'Sanity' },
+        { id: 'contentful', name: 'Contentful' },
+        { id: 'payload', name: 'Payload' },
+        { id: 'strapi', name: 'Strapi' },
+        { id: 'notion-cms', name: 'Notion' },
+        { id: 'mdx', name: 'Markdown / MDX' },
+      ],
+    },
+    {
+      id: 'cicd', name: 'CI / CD', subtitle: 'Ship it',
+      items: [
+        { id: 'gh-actions', name: 'GitHub Actions' },
+        { id: 'vercel-deploys', name: 'Vercel Deploys' },
+        { id: 'circleci', name: 'CircleCI' },
+        { id: 'gitlab-ci', name: 'GitLab CI' },
+        { id: 'buildkite', name: 'Buildkite' },
+      ],
+    },
   ],
 }
 

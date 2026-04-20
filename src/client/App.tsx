@@ -4,11 +4,12 @@ import LayerCard from './components/LayerCard'
 import BottomBar, { type BottomAction } from './components/BottomBar'
 import EmailModal from './components/EmailModal'
 import StackSummary from './components/StackSummary'
+import DiagramExportFrame from './components/DiagramExportFrame'
 import { useDarkMode } from './hooks/useDarkMode'
 import { useStack } from './hooks/useStack'
 import { getMode } from '../shared/data'
 import { getStoredEmail, setStoredEmail, subscribe } from './lib/api'
-import { copyPromptToClipboard, copyStackImage, downloadDiagramMarkdown, downloadPng } from './lib/export'
+import { copyPromptToClipboard, copyStackImage, downloadPng } from './lib/export'
 
 const ACTION_CTA: Record<BottomAction, string> = {
   copy_prompt: 'Copy prompt',
@@ -23,6 +24,7 @@ export default function App() {
   const { mode, selected, setMode, toggle, reset, pickedCount } = useStack()
   const modeData = getMode(mode)
   const exportRef = useRef<HTMLDivElement>(null)
+  const diagramRef = useRef<HTMLDivElement>(null)
 
   const [pendingAction, setPendingAction] = useState<BottomAction | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -42,10 +44,10 @@ export default function App() {
         await copyStackImage(node)
         showToast('Stack image copied')
       } else if (action === 'download_png' && node) {
-        const { copied } = await downloadPng(node, `${mode}-stack.png`)
-        showToast(copied ? 'Image downloaded & copied to clipboard' : 'Image downloaded')
-      } else if (action === 'download_diagram') {
-        downloadDiagramMarkdown(modeData, selected, `${mode}-stack.md`)
+        await downloadPng(node, `${mode}-stack.png`)
+        showToast('Image downloaded')
+      } else if (action === 'download_diagram' && diagramRef.current) {
+        await downloadPng(diagramRef.current, `${mode}-stack-diagram.png`)
         showToast('Diagram downloaded')
       } else if (action === 'reset') {
         reset()
@@ -108,10 +110,13 @@ export default function App() {
           ))}
         </div>
 
-        {/* Off-screen export target */}
+        {/* Off-screen export targets */}
         <div style={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none' }}>
           <div ref={exportRef}>
             <StackSummary mode={modeData} selected={selected} />
+          </div>
+          <div ref={diagramRef}>
+            <DiagramExportFrame mode={modeData} selected={selected} />
           </div>
         </div>
       </main>

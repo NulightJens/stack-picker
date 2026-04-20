@@ -14,6 +14,10 @@ export default defineConfig({
     alias: {
       '@client': path.resolve(__dirname, 'src/client'),
     },
+    dedupe: ['react', 'react-dom'],
+  },
+  optimizeDeps: {
+    include: ['@xyflow/react', 'react', 'react-dom'],
   },
   server: {
     proxy: {
