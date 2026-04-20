@@ -40,8 +40,15 @@ re-prompt for the rest of the session.
 
 ## Logo chain
 
-For each item: Clearbit → Google favicon → Simple Icons → initials monogram.
-Implemented in `src/client/components/ItemLogo.tsx` with four-stage onError.
+For each item: Google favicon (via `/api/favicon` Worker proxy) → monochrome
+Simple Icons → initials monogram. Implemented in
+`src/client/components/ItemLogo.tsx` with three-stage `onError` fallbacks.
+
+Favicon stage runs for any item with a `domain` field. The proxy is
+same-origin so `html-to-image` can embed favicons into exported PNGs.
+Simple Icons fallback uses `cdn.simpleicons.org/<slug>/0a0a0a` so the SVG
+fill is baked black — consistent on the always-white logo tile in both
+light and dark modes.
 
 ## Reference
 
