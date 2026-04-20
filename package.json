@@ -15,9 +15,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@types/dagre": "^0.7.54",
-    "@xyflow/react": "^12.10.2",
-    "dagre": "^0.8.5",
     "hono": "^4.12.8",
     "html-to-image": "^1.11.13",
     "lucide-react": "^0.577.0",
