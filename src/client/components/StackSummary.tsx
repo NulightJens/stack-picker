@@ -4,7 +4,7 @@ import { SITE } from '../../../config/site'
 
 /**
  * Off-screen export target. Rendered wide and landscape for social/slide use.
- * Jens palette: dark charcoal bg, white text, neutral gray accents (no green).
+ * Monochrome palette — dark charcoal bg, white text, neutral gray accents.
  */
 export default function StackSummary({ mode, selected }: { mode: StackMode; selected: SelectedStack }) {
   const picks = mode.layers
