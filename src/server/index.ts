@@ -95,6 +95,24 @@ app.use('/api/*', async (c, next) => {
 })
 
 // Security headers on every response
+// Narrow CSP for HTML responses. JSON responses don't need this but it's
+// harmless. Shared between the Hono middleware and the asset-wrap helper so
+// both paths ship identical bytes (pre-refactor they drifted and caused a
+// production-only stale-CSP bug).
+const HTML_CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com data:",
+  // Brand logos come from Iconify (CORS-clean, covers simple-icons,
+  // Gil Barbara's logos, Devicon, Arcticons in one endpoint).
+  "img-src 'self' data: https://api.iconify.design",
+  "connect-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ')
+
 app.use('*', async (c, next) => {
   await next()
   const h = c.res.headers
@@ -102,24 +120,8 @@ app.use('*', async (c, next) => {
   h.set('X-Frame-Options', 'DENY')
   h.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   h.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()')
-  // Narrow CSP for HTML responses. JSON responses don't need this but it's harmless.
   if ((h.get('Content-Type') ?? '').startsWith('text/html')) {
-    h.set(
-      'Content-Security-Policy',
-      [
-        "default-src 'self'",
-        "script-src 'self'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com data:",
-        // Brand logos come from Iconify (CORS-clean, covers simple-icons,
-        // Gil Barbara's logos, Devicon, Arcticons in one endpoint).
-        "img-src 'self' data: https://api.iconify.design",
-        "connect-src 'self'",
-        "frame-ancestors 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-      ].join('; '),
-    )
+    h.set('Content-Security-Policy', HTML_CSP)
   }
 })
 
@@ -219,20 +221,7 @@ function withSecurityHeaders(res: Response): Response {
   headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()')
   const ct = headers.get('Content-Type') ?? ''
   if (ct.startsWith('text/html')) {
-    headers.set(
-      'Content-Security-Policy',
-      [
-        "default-src 'self'",
-        "script-src 'self'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com data:",
-        "img-src 'self' data: https://logo.clearbit.com https://www.google.com https://cdn.simpleicons.org",
-        "connect-src 'self'",
-        "frame-ancestors 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-      ].join('; '),
-    )
+    headers.set('Content-Security-Policy', HTML_CSP)
   }
   return new Response(res.body, {
     status: res.status,
