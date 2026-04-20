@@ -86,6 +86,10 @@ export default function App() {
             2026 {modeData.name === 'App Stack' ? 'Development Tools' : 'Content Operation'}
           </h1>
           <p className="text-[var(--text-secondary)] mt-2 text-sm sm:text-base">{modeData.tagline}</p>
+          <p className="mt-3 text-xs sm:text-sm text-[var(--text-muted)] max-w-xl mx-auto">
+            Pick your stack, then hit <strong className="text-[var(--text-secondary)] font-semibold">Copy prompt</strong> to drop
+            a ready-made architecture brief into Claude, ChatGPT, Cursor, or Windsurf and kickstart your project.
+          </p>
           <div className="mt-4 flex flex-wrap gap-2 text-[11px] justify-center">
             <Pill>Single click to select</Pill>
             <Pill>Click again to deselect</Pill>
