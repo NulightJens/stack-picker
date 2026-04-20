@@ -1,15 +1,16 @@
-import { useState, useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { initialsFor } from '../../shared/icons'
-import { ICON_SLUGS, iconUrl } from '../../shared/iconSlugs'
+import { ICON_SLUGS } from '../../shared/iconSlugs'
 
-type Stage = 'icon' | 'initials'
+type Stage = 'favicon' | 'simpleicons' | 'initials'
 
 interface Props {
   name: string
-  /** Retained for compatibility with existing callers; unused — logos come
-      from the Simple Icons slug map, not from item domains. */
+  /** The item's canonical domain — used to fetch a Google favicon via our
+      Worker proxy. Items without a domain skip straight to the Simple Icons
+      (or initials) stage. */
   domain?: string
-  /** Our internal item id — looked up in ICON_SLUGS to get an icon spec. */
+  /** Our internal item id — looked up in ICON_SLUGS for the fallback stage. */
   itemId?: string
   size: number
   rounded?: number
@@ -36,27 +37,60 @@ function useIsDark(): boolean {
   )
 }
 
+/** Client-side mirror of the Worker's server-side domain validator — keeps
+    junk out of the query string before we even hit the network. */
+function isValidDomain(d: string | undefined): d is string {
+  if (!d || d.length > 253) return false
+  if (!/^[a-z0-9.-]+$/i.test(d)) return false
+  if (d.startsWith('.') || d.endsWith('.')) return false
+  if (d.startsWith('-') || d.endsWith('-')) return false
+  if (!d.includes('.')) return false
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(d)) return false
+  return true
+}
+
+function faviconUrl(domain: string): string {
+  return `/api/favicon?domain=${encodeURIComponent(domain)}`
+}
+
+/** Monochrome Simple Icons. The `/0a0a0a` path segment forces the SVG fill
+    to that color. Black on our always-white logo tile reads in both light
+    and dark modes — no theme branching needed for the fallback. */
+function simpleIconsUrl(slug: string): string {
+  return `https://cdn.simpleicons.org/${slug}/0a0a0a`
+}
+
 /**
  * Logo rendering strategy:
- *   1. Brand-colored icon — Simple Icons CDN for bare slugs (fill=brand
- *      hex baked in), or Iconify `logos:` / `devicon:` / `arcticons:` pack
- *      for items the direct CDN 404s on.
- *   2. Initials monogram tile (fallback when no slug or icon 404).
+ *   1. Favicon — Google s2 favicons via our same-origin /api/favicon proxy.
+ *      Multi-color, matches how the real brand looks in a browser tab.
+ *   2. Simple Icons monochrome fallback — for items without a domain, or
+ *      when the favicon 404s. Only runs if ICON_SLUGS has a bare-slug entry
+ *      (pack: entries would go to Iconify which is blocked by CSP).
+ *   3. Initials — two-char monogram tile, theme-aware.
  *
- * The logo tile is kept on a solid white background so multi-color brand
- * SVGs have a consistent canvas to render on regardless of theme. A subtle
- * border blends it into either light or dark card bg.
+ * Logo tile stays white with a subtle border in both img stages. Favicons
+ * can be transparent or white-bg; the white tile + border guarantees a
+ * visible edge regardless of favicon character.
  */
-export default function ItemLogo({ name, itemId, size, rounded, inverted = false }: Props) {
+export default function ItemLogo({ name, domain, itemId, size, rounded, inverted = false }: Props) {
   const slug = itemId ? ICON_SLUGS[itemId] : undefined
-  const initialStage: Stage = slug ? 'icon' : 'initials'
+  const hasFavicon = isValidDomain(domain)
+  const hasSlug = typeof slug === 'string' && !slug.includes(':')
+
+  const initialStage: Stage = hasFavicon ? 'favicon' : hasSlug ? 'simpleicons' : 'initials'
   const [stage, setStage] = useState<Stage>(initialStage)
   const radius = rounded ?? Math.round(size * 0.22)
   const isDark = useIsDark()
 
-  if (stage === 'initials' || !slug) {
-    // Initials tile flips with theme so letters always contrast with the tile.
-    // Inverted cards (Entry node) want the opposite treatment.
+  // Reset the stage machine when the slotted item changes — otherwise a
+  // previously-fallen-through instance stays stuck on 'initials' when the
+  // user picks a different tool in the same layer slot.
+  useEffect(() => {
+    setStage(initialStage)
+  }, [initialStage, domain, slug])
+
+  if (stage === 'initials') {
     const tileIsLight = inverted ? !isDark : isDark
     return (
       <div
@@ -82,9 +116,12 @@ export default function ItemLogo({ name, itemId, size, rounded, inverted = false
     )
   }
 
+  const src =
+    stage === 'favicon' ? faviconUrl(domain as string) : simpleIconsUrl(slug as string)
+
   return (
     <img
-      src={iconUrl(slug)}
+      src={src}
       alt={name}
       width={size}
       height={size}
@@ -97,9 +134,14 @@ export default function ItemLogo({ name, itemId, size, rounded, inverted = false
         borderRadius: radius,
         objectFit: 'contain',
         background: '#ffffff',
+        border: '1px solid var(--border)',
         padding: Math.max(2, Math.round(size * 0.08)),
+        boxSizing: 'border-box',
       }}
-      onError={() => setStage('initials')}
+      onError={() => {
+        if (stage === 'favicon' && hasSlug) setStage('simpleicons')
+        else setStage('initials')
+      }}
     />
   )
 }
