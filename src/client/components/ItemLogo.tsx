@@ -129,7 +129,6 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, inverted
       alt={name}
       width={size}
       height={size}
-      loading="lazy"
       crossOrigin="anonymous"
       style={{
         width: size,
