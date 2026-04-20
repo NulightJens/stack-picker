@@ -132,10 +132,12 @@ app.get('/api/health', (c) => c.json({ ok: true }))
 /**
  * GET /api/favicon?domain=<domain>
  *
- * Same-origin proxy for favicon.im (which resolves each domain's own
- * favicon in one hop — no 301 redirect chain, which workerd/wrangler-dev
- * fetches flake on under concurrent load). Used by ItemLogo as the
- * primary logo source. Proxying (rather than direct <img src>):
+ * Same-origin proxy for Google's s2/favicons service. The upstream always
+ * 301-redirects to tN.gstatic.com; we follow that redirect manually
+ * (rather than letting fetch auto-follow) because Wrangler's local
+ * workerd flakes on auto-follow under concurrent load. We reject
+ * non-https Location headers as a defensive check. Used by ItemLogo as
+ * the primary logo source. Proxying (rather than direct <img src>):
  *   - Lets the browser treat the request as same-origin → html-to-image can
  *     embed favicons into exported PNGs without CORS drama.
  *   - Edge-caches via Cloudflare's default HTML/image caching, bounded by our
@@ -165,10 +167,23 @@ app.get('/api/favicon', async (c) => {
   }
   let upstream: Response
   try {
-    upstream = await fetch(
-      `https://favicon.im/${encodeURIComponent(domain)}`,
-      { signal: AbortSignal.timeout(5000) },
+    // Google's /s2/favicons always 301s to tN.gstatic.com. Wrangler's local
+    // workerd auto-follows redirects unreliably under concurrent load, so
+    // we do the redirect hop ourselves. One hop is enough — Google doesn't
+    // chain redirects past the gstatic CDN.
+    const initial = await fetch(
+      `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+      { redirect: 'manual', signal: AbortSignal.timeout(3000) },
     )
+    if (initial.status >= 300 && initial.status < 400) {
+      const location = initial.headers.get('Location')
+      if (!location || !location.startsWith('https://')) {
+        return c.json({ error: 'upstream unavailable' }, 502)
+      }
+      upstream = await fetch(location, { signal: AbortSignal.timeout(3000) })
+    } else {
+      upstream = initial
+    }
   } catch {
     return c.json({ error: 'upstream unavailable' }, 502)
   }
