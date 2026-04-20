@@ -77,7 +77,7 @@ Prerequisites: Cloudflare account + `wrangler login`.
 ```bash
 # 1. Create the D1 database
 npx wrangler d1 create stack-picker-db
-# Paste the printed database_id into wrangler.toml
+# Paste the printed database_id into wrangler.toml (seeded from wrangler.example.toml)
 
 # 2. Run the migration on remote
 npm run db:migrate:remote
@@ -90,8 +90,10 @@ npm run deploy
 Then add a custom domain in the Cloudflare dashboard:
 *Workers & Pages → stack-picker → Settings → Triggers → Custom Domains*.
 
-Update `SITE_URL` in [wrangler.toml](wrangler.toml) to your custom domain and
-redeploy — the Worker uses that value as the CORS allow-list origin.
+Update `SITE_URL` in `wrangler.toml` to your custom domain and redeploy — the
+Worker uses that value as the CORS allow-list origin. Your `wrangler.toml` is
+`.gitignore`-d; the tracked `wrangler.example.toml` is the template for future
+forkers, same pattern as `config/site.example.ts`.
 
 ---
 

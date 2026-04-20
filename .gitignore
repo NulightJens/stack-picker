@@ -10,5 +10,8 @@ dist/
 # Personal branding — forkers edit their own local copy. Example in config/site.example.ts.
 config/site.ts
 
+# Wrangler config with personal values (D1 id, SITE_URL). Example in wrangler.example.toml.
+wrangler.toml
+
 # Personal assets (avatar images, private copies, etc.) live here and never commit.
 public/private/
