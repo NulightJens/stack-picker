@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { initialsFor } from '../../shared/icons'
 import { ICON_SLUGS } from '../../shared/iconSlugs'
 
@@ -79,16 +79,20 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, inverted
   const hasSlug = typeof slug === 'string' && !slug.includes(':')
 
   const initialStage: Stage = hasFavicon ? 'favicon' : hasSlug ? 'simpleicons' : 'initials'
-  const [stage, setStage] = useState<Stage>(initialStage)
-  const radius = rounded ?? Math.round(size * 0.22)
-  const isDark = useIsDark()
-
   // Reset the stage machine when the slotted item changes — otherwise a
   // previously-fallen-through instance stays stuck on 'initials' when the
-  // user picks a different tool in the same layer slot.
-  useEffect(() => {
+  // user picks a different tool in the same layer slot. Using the prev-key
+  // render-time pattern avoids the wrong-logo flash that a post-render
+  // effect would cause (stale paint → effect → corrected paint).
+  const slotKey = `${domain ?? ''}|${slug ?? ''}`
+  const [prevSlotKey, setPrevSlotKey] = useState(slotKey)
+  const [stage, setStage] = useState<Stage>(initialStage)
+  if (prevSlotKey !== slotKey) {
+    setPrevSlotKey(slotKey)
     setStage(initialStage)
-  }, [initialStage, domain, slug])
+  }
+  const radius = rounded ?? Math.round(size * 0.22)
+  const isDark = useIsDark()
 
   if (stage === 'initials') {
     const tileIsLight = inverted ? !isDark : isDark
