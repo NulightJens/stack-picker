@@ -60,19 +60,47 @@ export async function copyStackImage(node: HTMLElement) {
     }
   }
 
-  downloadBlob(await renderPng(node), 'stack.png')
+  deliverBlob(await renderPng(node), 'stack.png')
 }
 
-/** Render a DOM node to PNG and trigger a file download. */
+/** Render a DOM node to PNG and trigger a file download (desktop) or
+    open the PNG in a new tab (touch / mobile — iOS Safari doesn't honor
+    <a download> and would otherwise navigate the current tab to the blob
+    URL, losing the app). */
 export async function downloadPng(node: HTMLElement, filename = 'stack.png'): Promise<void> {
-  downloadBlob(await renderPng(node), filename)
+  deliverBlob(await renderPng(node), filename)
 }
 
-function downloadBlob(blob: Blob, filename: string) {
+/** True when the current device is a touch device without hover capability
+    — iOS Safari, Android Chrome, etc. Same heuristic as `useIsTouch`, but
+    usable from plain modules. */
+function isTouchDevice(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
+}
+
+function deliverBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
+  if (isTouchDevice()) {
+    // Open the PNG in a new tab. The user can then long-press to save to
+    // Photos / Files / share. Revoke later so the new tab has time to
+    // fetch the blob before it's released.
+    const opened = window.open(url, '_blank')
+    if (!opened) {
+      // Popup blocked — fall through to the anchor path, which will at
+      // least navigate the current tab to the image (same as old behavior,
+      // but only on popup-block, not by default).
+      triggerAnchorDownload(url, filename)
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 30_000)
+    return
+  }
+  triggerAnchorDownload(url, filename)
+  setTimeout(() => URL.revokeObjectURL(url), 2000)
+}
+
+function triggerAnchorDownload(url: string, filename: string) {
   const a = document.createElement('a')
   a.href = url
   a.download = filename
   a.click()
-  setTimeout(() => URL.revokeObjectURL(url), 2000)
 }
