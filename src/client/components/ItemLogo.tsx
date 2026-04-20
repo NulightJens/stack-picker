@@ -1,6 +1,6 @@
 import { useState, useSyncExternalStore } from 'react'
 import { initialsFor } from '../../shared/icons'
-import { ICON_SLUGS, simpleIconUrl } from '../../shared/iconSlugs'
+import { ICON_SLUGS, iconUrl } from '../../shared/iconSlugs'
 
 type Stage = 'simpleicons' | 'initials'
 
@@ -94,7 +94,7 @@ export default function ItemLogo({ name, itemId, size, rounded, inverted = false
 
   return (
     <img
-      src={simpleIconUrl(slug, iconHex)}
+      src={iconUrl(slug, iconHex)}
       alt={name}
       width={size}
       height={size}
