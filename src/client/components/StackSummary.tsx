@@ -1,6 +1,9 @@
 import type { SelectedStack, StackMode } from '../../shared/types'
 
-/** Hidden-by-default export target rendered as a neat card for PNG download. */
+/**
+ * Off-screen export target. Rendered wide and landscape for social/slide use.
+ * Jens palette: dark charcoal bg, white text, neutral gray accents (no green).
+ */
 export default function StackSummary({ mode, selected }: { mode: StackMode; selected: SelectedStack }) {
   const picks = mode.layers
     .map(l => {
@@ -11,41 +14,163 @@ export default function StackSummary({ mode, selected }: { mode: StackMode; sele
     })
     .filter((x): x is { layer: string; item: string } => !!x)
 
+  const kicker = mode.name === 'App Stack' ? '2026 Development Tools' : '2026 Content Operation'
+
   return (
     <div
       data-export-root
       style={{
-        width: 720,
-        padding: 40,
-        background: '#ffffff',
-        color: '#15171a',
+        width: 1400,
+        padding: 72,
+        background:
+          'radial-gradient(ellipse 800px 500px at 80% 0%, rgba(255,255,255,0.04), transparent 70%), #0a0a0a',
+        color: '#fafafa',
         fontFamily: 'Manrope, sans-serif',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-        <div style={{ fontSize: 14, fontWeight: 700 }}>Jens Heitmann</div>
-        <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#cccccc' }} />
-        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#666666' }}>{mode.name}</div>
+      {/* Header */}
+      <div style={{ marginBottom: 56 }}>
+        <div
+          style={{
+            fontSize: 16,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#888',
+            marginBottom: 12,
+          }}
+        >
+          {kicker}
+        </div>
+        <div
+          style={{
+            fontSize: 88,
+            fontWeight: 800,
+            letterSpacing: '-0.035em',
+            lineHeight: 1,
+            color: '#ffffff',
+          }}
+        >
+          My 2026 Stack
+        </div>
       </div>
-      <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6, marginBottom: 24 }}>My 2026 {mode.name}</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      {/* Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
         {picks.map(p => (
-          <div key={p.layer} style={{ padding: 14, borderRadius: 10, border: '1px solid #e5e7eb', background: '#f9fafb' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#666666', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{p.layer}</div>
-            <div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{p.item}</div>
-          </div>
+          <Card key={p.layer} layer={p.layer} item={p.item} />
         ))}
         {picks.length === 0 && (
-          <div style={{ gridColumn: '1 / -1', padding: 20, textAlign: 'center', color: '#999', fontSize: 14 }}>
-            Nothing picked yet.
+          <div
+            style={{
+              gridColumn: '1 / -1',
+              padding: 48,
+              textAlign: 'center',
+              color: '#666',
+              fontSize: 18,
+              border: '1px dashed #222',
+              borderRadius: 14,
+            }}
+          >
+            Nothing picked yet — start clicking.
           </div>
         )}
       </div>
 
-      <div style={{ marginTop: 24, fontSize: 11, color: '#999' }}>
-        stack.jensheitmann.com
+      {/* Footer */}
+      <div
+        style={{
+          marginTop: 56,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: 14,
+          color: '#555',
+          letterSpacing: '0.02em',
+        }}
+      >
+        <div>
+          {picks.length} {picks.length === 1 ? 'layer' : 'layers'}
+          <span style={{ margin: '0 10px', color: '#333' }}>·</span>
+          stack.jensheitmann.com
+        </div>
+        <div style={{ fontWeight: 700, color: '#888' }}>Jens Heitmann</div>
       </div>
     </div>
   )
+}
+
+function Card({ layer, item }: { layer: string; item: string }) {
+  const initials = getInitials(item)
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 20,
+        padding: '22px 24px',
+        borderRadius: 14,
+        background: '#141414',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <div
+        style={{
+          flexShrink: 0,
+          width: 64,
+          height: 64,
+          borderRadius: 14,
+          background: '#ffffff',
+          color: '#0a0a0a',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: initials.length > 1 ? 22 : 28,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {initials}
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: '#888',
+            marginBottom: 4,
+          }}
+        >
+          {layer}
+        </div>
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            color: '#ffffff',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {item}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Cheap initials from an item name: up to 2 chars, uppercase. */
+function getInitials(name: string): string {
+  const cleaned = name.replace(/[()]/g, '').trim()
+  const words = cleaned.split(/[\s/.-]+/).filter(Boolean)
+  if (words.length === 0) return '?'
+  if (words.length === 1) {
+    // Single word: first two chars (e.g. "React" -> "Re")
+    return words[0].slice(0, 2).toUpperCase()
+  }
+  return (words[0][0] + words[1][0]).toUpperCase()
 }

@@ -42,8 +42,8 @@ export default function App() {
         await copyStackImage(node)
         showToast('Stack image copied')
       } else if (action === 'download_png' && node) {
-        await downloadPng(node, `${mode}-stack.png`)
-        showToast('PNG downloaded')
+        const { copied } = await downloadPng(node, `${mode}-stack.png`)
+        showToast(copied ? 'Image downloaded & copied to clipboard' : 'Image downloaded')
       } else if (action === 'download_diagram') {
         downloadDiagramMarkdown(modeData, selected, `${mode}-stack.md`)
         showToast('Diagram downloaded')

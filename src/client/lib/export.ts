@@ -1,4 +1,4 @@
-import { toPng, toBlob } from 'html-to-image'
+import { toBlob } from 'html-to-image'
 import type { SelectedStack, StackMode } from '../../shared/types'
 import { buildPrompt } from '../../shared/prompt'
 
@@ -19,12 +19,30 @@ export async function copyStackImage(node: HTMLElement) {
   downloadBlob(blob, 'stack.png')
 }
 
-export async function downloadPng(node: HTMLElement, filename = 'stack.png') {
-  const dataUrl = await toPng(node, { cacheBust: true, pixelRatio: 2 })
-  const a = document.createElement('a')
-  a.href = dataUrl
-  a.download = filename
-  a.click()
+/**
+ * Render the stack summary as a PNG, trigger a download, AND copy the same
+ * image to the clipboard so the user can paste it straight into Slack, Notion,
+ * X, etc. Returns `{ copied: boolean }` so the caller can tune the toast.
+ */
+export async function downloadPng(node: HTMLElement, filename = 'stack.png'): Promise<{ copied: boolean }> {
+  const blob = await toBlob(node, { cacheBust: true, pixelRatio: 2 })
+  if (!blob) throw new Error('Could not render image')
+
+  // 1. Download the file
+  downloadBlob(blob, filename)
+
+  // 2. Best-effort copy to clipboard (may fail silently outside a user gesture
+  // or in browsers without ClipboardItem support — that's fine)
+  let copied = false
+  try {
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+      copied = true
+    }
+  } catch {
+    copied = false
+  }
+  return { copied }
 }
 
 export function downloadDiagramMarkdown(mode: StackMode, selected: SelectedStack, filename = 'stack.md') {
