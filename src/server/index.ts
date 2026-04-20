@@ -105,9 +105,10 @@ const HTML_CSP = [
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
-  // Brand logos: simple-icons direct CDN (brand-color baked in) for bare
-  // slugs, Iconify for trademark-pruned brands via the `logos` pack.
-  "img-src 'self' data: https://cdn.simpleicons.org https://api.iconify.design",
+  // Brand logos: simple-icons direct CDN, used as the monochrome fallback
+  // when the Google favicon (via /api/favicon) 404s. Favicon fetches are
+  // same-origin so they're already covered by 'self'.
+  "img-src 'self' data: https://cdn.simpleicons.org",
   "connect-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
