@@ -41,6 +41,7 @@ const MAX_BODY_BYTES = 8 * 1024
 const MAX_EMAIL_LEN = 254
 const MAX_STACK_KEYS = 32
 const MAX_VALUE_LEN = 64
+const MAX_DOMAIN_LENGTH = 253
 
 // Sliding-window rate limiter (per-isolate, per-IP)
 const RATE_LIMIT_WINDOW_MS = 60 * 1000
@@ -135,26 +136,47 @@ app.get('/api/health', (c) => c.json({ ok: true }))
  *   - Lets the browser treat the request as same-origin → html-to-image can
  *     embed favicons into exported PNGs without CORS drama.
  *   - Edge-caches via Cloudflare's default HTML/image caching, bounded by our
- *     own `immutable` Cache-Control.
+ *     own `immutable` Cache-Control (only on 2xx — transient upstream errors
+ *     use `no-store` so a bad response can't be pinned for a month).
  *   - Lets us swap the upstream later (Favicon.im, DuckDuckGo, etc.) without
  *     touching every client call site.
  *
- * Domain regex is deliberately strict — no scheme, path, or userinfo — to
- * prevent SSRF via crafted `?domain=` inputs.
+ * Domain regex is deliberately strict — no scheme, path, userinfo, IP
+ * literals, or single-label hosts — to prevent SSRF via crafted `?domain=`
+ * inputs. Length check runs before regex to cap pathological input cost.
  */
+function isValidProxyDomain(d: string | undefined): d is string {
+  if (!d || d.length > MAX_DOMAIN_LENGTH) return false
+  if (!/^[a-z0-9.-]+$/i.test(d)) return false
+  if (d.startsWith('.') || d.endsWith('.')) return false
+  if (d.startsWith('-') || d.endsWith('-')) return false
+  if (!d.includes('.')) return false
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(d)) return false
+  return true
+}
+
 app.get('/api/favicon', async (c) => {
   const domain = c.req.query('domain')
-  if (!domain || !/^[a-z0-9.-]+$/i.test(domain) || domain.length > 253) {
+  if (!isValidProxyDomain(domain)) {
     return c.json({ error: 'bad domain' }, 400)
   }
-  const upstream = await fetch(
-    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
-  )
+  let upstream: Response
+  try {
+    upstream = await fetch(
+      `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`,
+      { signal: AbortSignal.timeout(5000) },
+    )
+  } catch {
+    return c.json({ error: 'upstream unavailable' }, 502)
+  }
+  const cacheControl = upstream.ok
+    ? 'public, max-age=2592000, immutable'
+    : 'no-store'
   return new Response(upstream.body, {
     status: upstream.status,
     headers: {
       'Content-Type': upstream.headers.get('Content-Type') ?? 'image/png',
-      'Cache-Control': 'public, max-age=2592000, immutable',
+      'Cache-Control': cacheControl,
       'Access-Control-Allow-Origin': '*',
     },
   })
