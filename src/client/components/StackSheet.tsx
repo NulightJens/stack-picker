@@ -4,6 +4,8 @@ import type { SelectedStack, StackMode } from '../../shared/types'
 import ItemLogo from './ItemLogo'
 import type { BottomAction } from './BottomBar'
 
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+
 export interface StackSheetProps {
   open: boolean
   onOpenChange: (next: boolean) => void
@@ -50,6 +52,47 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
     if (open) setDragY(0)
   }, [open])
 
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
+
+  // Capture the element that had focus before the sheet opened, then focus
+  // the primary action. On close, restore focus to the opener.
+  useEffect(() => {
+    if (!open) return
+    openerRef.current = document.activeElement as HTMLElement | null
+    const primary = sheetRef.current?.querySelector<HTMLButtonElement>('[data-sheet-primary]')
+    primary?.focus()
+    return () => {
+      openerRef.current?.focus?.()
+    }
+  }, [open])
+
+  // Trap Tab / Shift+Tab inside the sheet.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      const root = sheetRef.current
+      if (!root) return
+      const focusables = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        el => !el.hasAttribute('disabled') && el.offsetParent !== null,
+      )
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      if (e.shiftKey && active === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
   if (!open) return null
 
   const fire = (a: BottomAction) => {
@@ -67,6 +110,7 @@ export default function StackSheet({ open, onOpenChange, mode, selected, onActio
 
       {/* Sheet */}
       <div
+        ref={sheetRef}
         className="absolute left-0 right-0 bottom-0 bg-[var(--surface)] rounded-t-2xl shadow-2xl border-t border-[var(--border)] flex flex-col sheet-slide"
         style={{
           maxHeight: '85vh',
