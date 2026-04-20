@@ -2,25 +2,25 @@ import { useState, useSyncExternalStore } from 'react'
 import { initialsFor } from '../../shared/icons'
 import { ICON_SLUGS, iconUrl } from '../../shared/iconSlugs'
 
-type Stage = 'simpleicons' | 'initials'
+type Stage = 'icon' | 'initials'
 
 interface Props {
   name: string
   /** Retained for compatibility with existing callers; unused — logos come
       from the Simple Icons slug map, not from item domains. */
   domain?: string
-  /** Our internal item id — looked up in ICON_SLUGS to get a Simple Icons slug. */
+  /** Our internal item id — looked up in ICON_SLUGS to get an icon spec. */
   itemId?: string
   size: number
   rounded?: number
   /** True when this logo sits on a card whose bg is inverted relative to the
-      page theme (e.g. the Entry node in the system diagram). Flips the tile
-      colors so the logo always contrasts with its immediate surface. */
+      page theme (e.g. the Entry node in the system diagram). Flips the
+      initials tile colors so letters stay readable. */
   inverted?: boolean
 }
 
 /**
- * Theme-reactive — subscribes to `class` changes on `<html>` so the logo
+ * Theme-reactive — subscribes to `class` changes on `<html>` so the initials
  * tile flips live when the user toggles dark mode. Safe during SSR.
  */
 function useIsDark(): boolean {
@@ -38,36 +38,26 @@ function useIsDark(): boolean {
 
 /**
  * Logo rendering strategy:
- *   1. Simple Icons CDN (clean monochrome brand SVG) — CORS-clean, exports
- *      cleanly to PNG because html-to-image can fetch it without taint.
- *   2. Initials monogram tile (fallback for items with no slug or a 404).
+ *   1. Brand-colored icon — Simple Icons CDN for bare slugs (fill=brand
+ *      hex baked in), or Iconify `logos:` / `devicon:` / `arcticons:` pack
+ *      for items the direct CDN 404s on.
+ *   2. Initials monogram tile (fallback when no slug or icon 404).
  *
- * Tile colors track the current theme via `useIsDark()` so the same component
- * renders cleanly in both light and dark exports. The logo SVG is forced to a
- * monochrome hex that contrasts with the tile, which also matches the site's
- * editorial monochrome aesthetic (brand colors were never a goal).
+ * The logo tile is kept on a solid white background so multi-color brand
+ * SVGs have a consistent canvas to render on regardless of theme. A subtle
+ * border blends it into either light or dark card bg.
  */
 export default function ItemLogo({ name, itemId, size, rounded, inverted = false }: Props) {
   const slug = itemId ? ICON_SLUGS[itemId] : undefined
-  const initialStage: Stage = slug ? 'simpleicons' : 'initials'
+  const initialStage: Stage = slug ? 'icon' : 'initials'
   const [stage, setStage] = useState<Stage>(initialStage)
   const radius = rounded ?? Math.round(size * 0.22)
   const isDark = useIsDark()
 
-  // Regular cards track page theme; inverted cards flip vs page.
-  // The tile should always be the inverse of its card so the logo stands out.
-  //   - dark mode, not inverted: card dark → tile light
-  //   - dark mode, inverted    : card light → tile dark
-  //   - light mode, not inverted: card light → tile dark
-  //   - light mode, inverted   : card dark → tile light
-  const tileIsLight = inverted ? !isDark : isDark
-  const tileBg = tileIsLight ? '#ffffff' : '#15171a'
-  const tileFg = tileIsLight ? '#0a0a0a' : '#ffffff'
-  // Simple Icons CDN accepts `/<slug>/<hex>` to force the icon color — we strip
-  // the leading `#` so both 6-char and plain strings work.
-  const iconHex = tileIsLight ? '0a0a0a' : 'ffffff'
-
   if (stage === 'initials' || !slug) {
+    // Initials tile flips with theme so letters always contrast with the tile.
+    // Inverted cards (Entry node) want the opposite treatment.
+    const tileIsLight = inverted ? !isDark : isDark
     return (
       <div
         aria-hidden
@@ -76,8 +66,8 @@ export default function ItemLogo({ name, itemId, size, rounded, inverted = false
           height: size,
           flexShrink: 0,
           borderRadius: radius,
-          background: tileBg,
-          color: tileFg,
+          background: tileIsLight ? '#ffffff' : '#15171a',
+          color: tileIsLight ? '#0a0a0a' : '#ffffff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -94,7 +84,7 @@ export default function ItemLogo({ name, itemId, size, rounded, inverted = false
 
   return (
     <img
-      src={iconUrl(slug, iconHex)}
+      src={iconUrl(slug)}
       alt={name}
       width={size}
       height={size}
@@ -106,7 +96,7 @@ export default function ItemLogo({ name, itemId, size, rounded, inverted = false
         flexShrink: 0,
         borderRadius: radius,
         objectFit: 'contain',
-        background: tileBg,
+        background: '#ffffff',
         padding: Math.max(2, Math.round(size * 0.08)),
       }}
       onError={() => setStage('initials')}

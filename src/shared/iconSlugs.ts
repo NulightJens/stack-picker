@@ -58,10 +58,10 @@ export const ICON_SLUGS: Record<string, string> = {
   // slugs via Iconify.
   vercel: 'vercel',
   'cloudflare-workers': 'cloudflareworkers',
-  'aws-lambda': 'awslambda',
-  'aws-ec2': 'amazonec2',
+  'aws-lambda': 'logos:aws-lambda',
+  'aws-ec2': 'logos:aws-ec2',
   'gcp-run': 'googlecloud',
-  'azure-app': 'microsoftazure',
+  'azure-app': 'logos:microsoft-azure',
   fly: 'flydotio',
   railway: 'railway',
   render: 'render',
@@ -76,7 +76,7 @@ export const ICON_SLUGS: Record<string, string> = {
   mysql: 'mysql',
   mongodb: 'mongodb',
   firebase: 'firebase',
-  dynamodb: 'amazondynamodb',
+  dynamodb: 'logos:aws-dynamodb',
   convex: 'convex',
   turso: 'turso',
   d1: 'cloudflare',
@@ -99,14 +99,14 @@ export const ICON_SLUGS: Record<string, string> = {
   workos: 'logos:workos',
   'firebase-auth': 'firebase',
   'better-auth': 'betterauth',
-  cognito: 'amazoncognito',
+  cognito: 'logos:aws-cognito',
 
   // Storage
-  s3: 'amazons3',
+  s3: 'logos:aws-s3',
   r2: 'cloudflare',
   'vercel-blob': 'vercel',
   gcs: 'googlecloudstorage',
-  'azure-blob': 'microsoftazure',
+  'azure-blob': 'logos:microsoft-azure',
   // uploadthing — not on Iconify, falls through to initials
 
   // Monitoring
@@ -135,7 +135,7 @@ export const ICON_SLUGS: Record<string, string> = {
   resend: 'resend',
   // postmark — not on Iconify, initials
   // sendgrid — in Iconify's simple-icons bundle
-  sendgrid: 'sendgrid',
+  sendgrid: 'logos:sendgrid',
   ses: 'logos:aws-ses',
   mailgun: 'mailgun',
   loops: 'loops',
@@ -149,7 +149,7 @@ export const ICON_SLUGS: Record<string, string> = {
 
   // AI
   anthropic: 'anthropic',
-  openai: 'openai',
+  openai: 'logos:openai',
   gemini: 'googlegemini',
   'vercel-ai': 'vercel',
   replicate: 'replicate',
@@ -182,7 +182,7 @@ export const ICON_SLUGS: Record<string, string> = {
   notion: 'notion',
   obsidian: 'obsidian',
   airtable: 'airtable',
-  chatgpt: 'openai',
+  chatgpt: 'logos:openai',
   claude: 'anthropic',
   perplexity: 'perplexity',
   'x-trends': 'x',
@@ -191,20 +191,20 @@ export const ICON_SLUGS: Record<string, string> = {
   'google-docs': 'googledocs',
   'notion-w': 'notion',
   'claude-w': 'anthropic',
-  'chatgpt-w': 'openai',
+  'chatgpt-w': 'logos:openai',
   // hemingway — not on Iconify, initials
   grammarly: 'grammarly',
 
   // Voice
   elevenlabs: 'elevenlabs',
   // play-ht, cartesia — not on Iconify, initials
-  'openai-voice': 'openai',
+  'openai-voice': 'logos:openai',
   'descript-overdub': 'logos:descript',
 
   // Editing — Adobe trademarks pruned from simple-icons direct CDN but
   // preserved in Iconify's bundled snapshot.
   capcut: 'arcticons:capcut',
-  premiere: 'adobepremierepro',
+  premiere: 'logos:adobe-premiere',
   // final-cut — not on Iconify, initials
   davinci: 'davinciresolve',
   descript: 'logos:descript',
@@ -214,19 +214,19 @@ export const ICON_SLUGS: Record<string, string> = {
   'instagram-reels': 'instagram',
   tiktok: 'tiktok',
   'youtube-shorts': 'youtubeshorts',
-  'linkedin-short': 'linkedin',
+  'linkedin-short': 'logos:linkedin-icon',
   'x-video': 'x',
 
   // Long-form
   youtube: 'youtube',
   podcast: 'spotify',
-  'linkedin-long': 'linkedin',
+  'linkedin-long': 'logos:linkedin-icon',
   twitch: 'twitch',
 
   // Thumbnails
   figma: 'figma',
-  canva: 'canva',
-  photoshop: 'adobephotoshop',
+  canva: 'simple-icons:canva', // pruned from direct CDN; Iconify bundle keeps it (monochrome).
+  photoshop: 'logos:adobe-photoshop',
   midjourney: 'logos:midjourney',
   'nano-banana': 'googlegemini',
   // ideogram — not on Iconify, initials
@@ -257,15 +257,23 @@ export const ICON_SLUGS: Record<string, string> = {
 /**
  * Build the CDN URL for an icon spec.
  *
- * @param spec       A value from ICON_SLUGS. `"bare"` resolves to
- *                   `simple-icons:bare`; `"pack:name"` is used verbatim.
- * @param colorHex   Optional hex (with or without `#`). Forces fill color on
- *                   monochrome packs (simple-icons, arcticons, devicon -plain
- *                   variants). No-op on multi-color packs like `logos`.
+ * Dual source by design:
+ *   - Bare slug → Simple Icons direct CDN, which bakes the brand's primary
+ *     color into the SVG `fill`. Every working simple-icons brand ships
+ *     brand-colored.
+ *   - `"pack:name"` → Iconify, for packs the direct CDN doesn't cover
+ *     (trademark-pruned brands in the `logos` pack, pictograms in
+ *     `arcticons`, etc.) and which typically ship multi-color branded
+ *     SVGs too.
+ *
+ * The brand-color goal is why we don't round-trip everything through
+ * Iconify's simple-icons pack: it rewrites SVG fills to `currentColor`,
+ * stripping the brand color. Direct CDN preserves it.
  */
-export function iconUrl(spec: string, colorHex?: string): string {
-  const [pack, name] = spec.includes(':') ? spec.split(':', 2) : ['simple-icons', spec]
-  const color = colorHex ? colorHex.replace(/^#/, '') : undefined
-  const query = color ? `?color=${encodeURIComponent('#' + color)}` : ''
-  return `https://api.iconify.design/${pack}/${name}.svg${query}`
+export function iconUrl(spec: string): string {
+  if (spec.includes(':')) {
+    const [pack, name] = spec.split(':', 2)
+    return `https://api.iconify.design/${pack}/${name}.svg`
+  }
+  return `https://cdn.simpleicons.org/${spec}`
 }

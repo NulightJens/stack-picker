@@ -104,9 +104,9 @@ const HTML_CSP = [
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
-  // Brand logos come from Iconify (CORS-clean, covers simple-icons,
-  // Gil Barbara's logos, Devicon, Arcticons in one endpoint).
-  "img-src 'self' data: https://api.iconify.design",
+  // Brand logos: simple-icons direct CDN (brand-color baked in) for bare
+  // slugs, Iconify for trademark-pruned brands via the `logos` pack.
+  "img-src 'self' data: https://cdn.simpleicons.org https://api.iconify.design",
   "connect-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
