@@ -61,6 +61,7 @@ export const APP_MODE: StackMode = {
         { id: 'render', name: 'Render', domain: 'render.com' },
         { id: 'netlify', name: 'Netlify', domain: 'netlify.com' },
         { id: 'digitalocean', name: 'DigitalOcean', domain: 'digitalocean.com' },
+        { id: 'cloudflare-pages', name: 'Cloudflare Pages', domain: 'cloudflare.com' },
       ],
     },
     {
@@ -113,6 +114,7 @@ export const APP_MODE: StackMode = {
         { id: 'gcs', name: 'Google Cloud Storage', domain: 'cloud.google.com' },
         { id: 'azure-blob', name: 'Azure Blob', domain: 'azure.microsoft.com' },
         { id: 'uploadthing', name: 'UploadThing', domain: 'uploadthing.com' },
+        { id: 'supabase-storage', name: 'Supabase Storage', domain: 'supabase.com' },
       ],
     },
     {
