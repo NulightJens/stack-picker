@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@source "./vendor/site-header";
+
 @theme {
   --font-sans: 'Manrope', sans-serif;
 }
