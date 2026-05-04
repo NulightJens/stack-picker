@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "node scripts/init-config.mjs",
+    "sync:site-header": "node scripts/sync-site-header.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "wrangler dev",

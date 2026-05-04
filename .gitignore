@@ -15,3 +15,6 @@ wrangler.toml
 
 # Personal assets (avatar images, private copies, etc.) live here and never commit.
 public/private/
+
+# Vendored from ~/Projects/jensheitmann.com/packages/site-header
+src/client/vendor/site-header/
