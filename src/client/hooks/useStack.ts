@@ -50,7 +50,11 @@ export function useStack() {
     setState(s => ({ ...s, [s.mode]: {} }))
   }, [])
 
+  const applyStarter = useCallback((picks: Record<string, string>) => {
+    setState(s => ({ ...s, app: { ...picks } }))
+  }, [])
+
   const pickedCount = Object.values(selected).filter(Boolean).length
 
-  return { mode: state.mode, selected, setMode, toggle, reset, pickedCount }
+  return { mode: state.mode, selected, setMode, toggle, reset, applyStarter, pickedCount }
 }
