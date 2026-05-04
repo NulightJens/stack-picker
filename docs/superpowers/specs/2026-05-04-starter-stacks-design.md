@@ -39,10 +39,10 @@ Per-layer picks (all `id` strings reference items in `src/shared/data.ts`):
   'web-analytics': 'cf-analytics',
   email: 'resend',
   payments: 'stripe',
-  'ai-llm': 'anthropic',
+  ai: 'anthropic',
   search: 'typesense',
   cms: 'mdx',
-  'ci-cd': 'gh-actions',
+  cicd: 'gh-actions',
 }
 ```
 
@@ -63,10 +63,10 @@ Per-layer picks (all `id` strings reference items in `src/shared/data.ts`):
   'web-analytics': 'vercel-analytics',
   email: 'resend',
   payments: 'stripe',
-  'ai-llm': 'openai',
+  ai: 'openai',
   search: 'algolia',
   cms: 'sanity',
-  'ci-cd': 'vercel-deploys',
+  cicd: 'vercel-deploys',
 }
 ```
 
@@ -87,10 +87,10 @@ Per-layer picks (all `id` strings reference items in `src/shared/data.ts`):
   'web-analytics': 'plausible',
   email: 'resend',
   payments: 'stripe',
-  'ai-llm': 'anthropic',
+  ai: 'anthropic',
   search: 'postgres-fts',
   cms: 'payload',
-  'ci-cd': 'gh-actions',
+  cicd: 'gh-actions',
 }
 ```
 
