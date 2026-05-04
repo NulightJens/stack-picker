@@ -30,6 +30,7 @@ function ModeButton({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
         active
