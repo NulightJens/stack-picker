@@ -13,7 +13,7 @@ export interface Starter {
 export const STARTERS: Starter[] = [
   {
     id: 'cloudflare',
-    name: 'The Cloudflare Stack',
+    name: 'Cloudflare Connoisseur',
     tagline: 'One bill, edge-first, low-config.',
     highlight: ['astro', 'hono', 'cloudflare-pages', 'd1', 'r2', 'drizzle', 'better-auth'],
     picks: {
