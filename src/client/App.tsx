@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Header } from './vendor/site-header/Header'
 import ModeSwitcher from './components/ModeSwitcher'
 import LayerCard from './components/LayerCard'
+import StarterStacks from './components/StarterStacks'
 import BottomBar, { type BottomAction } from './components/BottomBar'
 import EmailModal from './components/EmailModal'
 import StackSummary from './components/StackSummary'
@@ -23,7 +24,7 @@ const ACTION_CTA: Record<BottomAction, string> = {
 
 export default function App() {
   const [dark, toggleDark] = useDarkMode()
-  const { mode, selected, setMode, toggle, reset, pickedCount } = useStack()
+  const { mode, selected, setMode, toggle, reset, applyStarter, pickedCount } = useStack()
   const modeData = getMode(mode)
 
   useEffect(() => {
@@ -108,7 +109,9 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <StarterStacks mode={mode} selected={selected} applyStarter={applyStarter} />
+
+        <div data-layers-grid className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {modeData.layers.map(layer => (
             <LayerCard
               key={layer.id}
