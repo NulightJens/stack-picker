@@ -260,11 +260,14 @@ app.post('/api/subscribe', async (c) => {
   const userAgent = (c.req.header('User-Agent') ?? '').slice(0, 256)
 
   try {
+    // Shared subscribers DB across jensheitmann.com tools — `source` flags
+    // which property captured the email; `payload` holds the source-specific
+    // JSON snapshot (here: the stack selection).
     await c.env.DB
       .prepare(
-        'INSERT INTO subscribers (email, action, mode, stack_json, user_agent) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO subscribers (source, email, action, payload, mode, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
       )
-      .bind(email.toLowerCase(), action, mode, JSON.stringify(stack), userAgent || null)
+      .bind('stack-picker', email.toLowerCase(), action, JSON.stringify(stack), mode, userAgent || null)
       .run()
   } catch (err) {
     console.error('subscribe insert failed', err)
