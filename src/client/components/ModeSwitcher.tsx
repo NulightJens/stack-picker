@@ -7,8 +7,8 @@ interface Props {
 
 export default function ModeSwitcher({ mode, onChange }: Props) {
   return (
-    <div className="border-b border-[var(--border)] bg-[var(--background)]">
-      <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-2">
+    <div className="sticky top-14 z-20 bg-[var(--background)]/95 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-end gap-2 px-4 py-2">
         <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-1">
           <ModeButton active={mode === 'app'} onClick={() => onChange('app')}>App</ModeButton>
           <ModeButton active={mode === 'content'} onClick={() => onChange('content')}>Content</ModeButton>
