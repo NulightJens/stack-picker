@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import Nav from './components/Nav'
+import { Header } from './vendor/site-header/Header'
+import ModeSwitcher from './components/ModeSwitcher'
 import LayerCard from './components/LayerCard'
 import BottomBar, { type BottomAction } from './components/BottomBar'
 import EmailModal from './components/EmailModal'
@@ -87,7 +88,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Nav mode={mode} onModeChange={setMode} dark={dark} onToggleDark={toggleDark} />
+      <Header currentSite="stack" dark={dark} onToggleDark={toggleDark} />
+      <ModeSwitcher mode={mode} onChange={setMode} />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 sm:py-12">
         <div className="mb-8 sm:mb-12 text-center">
