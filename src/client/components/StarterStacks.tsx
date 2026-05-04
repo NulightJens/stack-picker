@@ -46,14 +46,6 @@ export default function StarterStacks({ mode, selected, applyStarter }: Props) {
 
   const handleApply = (starter: Starter) => {
     applyStarter(starter.picks)
-    // Defer the scroll to the next frame so React commits the new selection
-    // before we move the viewport — otherwise the user sees the scroll
-    // happen against the old (empty) cards for a flash.
-    requestAnimationFrame(() => {
-      document
-        .querySelector('[data-layers-grid]')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
   }
 
   return (
