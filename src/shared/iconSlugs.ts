@@ -29,21 +29,21 @@ export const THESVG_SLUGS: Record<string, string> = {
   svelte: 'svelte',
   astro: 'astro/light',
   solidjs: 'solidjs',
-  angular: 'angular/mono',
+  angular: 'angular',
   remix: 'remix/light',
-  nuxt: 'nuxt/mono',
+  nuxt: 'nuxt',
 
   // Styling / UI
-  tailwind: 'tailwind-css/mono',
+  tailwind: 'tailwind-css',
   shadcn: 'shadcn-ui/light',
   radix: 'radix-ui/light',
-  chakra: 'chakra-ui/mono',
+  chakra: 'chakra-ui',
   mantine: 'mantine',
   mui: 'mui',
   bootstrap: 'bootstrap',
 
   // Backend
-  nodejs: 'nodedotjs/mono',
+  nodejs: 'nodedotjs',
   bun: 'bun',
   deno: 'deno/light',
   'python-fastapi': 'fastapi',
@@ -118,7 +118,7 @@ export const THESVG_SLUGS: Record<string, string> = {
   'better-stack': 'better-stack',
 
   // Product Analytics
-  posthog: 'posthog/mono',
+  posthog: 'posthog',
   mixpanel: 'mixpanel',
 
   // Web Analytics
@@ -137,7 +137,7 @@ export const THESVG_SLUGS: Record<string, string> = {
   loops: 'loops',
 
   // Payments
-  stripe: 'stripe/mono',
+  stripe: 'stripe',
   lemonsqueezy: 'lemon-squeezy',
   paddle: 'paddle',
   polar: 'polar/light',
@@ -153,7 +153,7 @@ export const THESVG_SLUGS: Record<string, string> = {
   // together: theSVG only carries a wide wordmark, falls back to favicon.
 
   // Search
-  algolia: 'algolia/mono',
+  algolia: 'algolia',
   meilisearch: 'meilisearch',
   typesense: 'typesense',
   elastic: 'elastic',
@@ -203,14 +203,14 @@ export const THESVG_SLUGS: Record<string, string> = {
   remotion: 'remotion',
 
   // Short-form
-  'instagram-reels': 'instagram/mono',
+  'instagram-reels': 'instagram',
   tiktok: 'tiktok',
   'youtube-shorts': 'youtube-shorts',
   'linkedin-short': 'linkedin',
   'x-video': 'x',
 
   // Long-form
-  youtube: 'youtube/mono',
+  youtube: 'youtube',
   podcast: 'spotify',
   'linkedin-long': 'linkedin',
   twitch: 'twitch',
