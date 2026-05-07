@@ -105,10 +105,10 @@ const HTML_CSP = [
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
-  // Brand logos: simple-icons direct CDN, used as the monochrome fallback
-  // when the Google favicon (via /api/favicon) 404s. Favicon fetches are
-  // same-origin so they're already covered by 'self'.
-  "img-src 'self' data: https://cdn.simpleicons.org",
+  // Brand logos: theSVG CDN is the primary source; Google favicon (via the
+  // same-origin /api/favicon proxy, covered by 'self') is the fallback for
+  // brands theSVG doesn't carry.
+  "img-src 'self' data: https://thesvg.org",
   "connect-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",

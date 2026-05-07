@@ -1,279 +1,249 @@
 /**
- * Maps our internal item ids to Iconify icon specs.
+ * Maps our internal item ids to theSVG icon paths (https://thesvg.org).
  *
- * Values are one of:
- *   - `"bare-slug"`           → `simple-icons:<slug>` via Iconify
- *   - `"pack:name"`            → any Iconify pack (logos, devicon, arcticons…)
+ * Value format:
+ *   - `"slug"`           → uses the `default` variant
+ *   - `"slug/variant"`   → uses an explicit variant (e.g. `vercel/light`)
  *
- * We route everything through `api.iconify.design` because:
- *   1. It has the same simple-icons slugs the upstream CDN serves — but its
- *      bundled snapshot still includes trademarked brands (AWS, Microsoft,
- *      Adobe, OpenAI, LinkedIn, Canva…) that simple-icons pruned from their
- *      direct CDN.
- *   2. It exposes other icon packs (Gil Barbara's `logos`, Devicon, Arcticons)
- *      for tools that simple-icons never covered.
- *   3. It supports `?color=<hex>` for forcing a monochrome fill on the
- *      simple-icons pack, which keeps the editorial monochrome aesthetic
- *      coherent with the current light/dark theme.
+ * The CDN URL is `https://thesvg.org/icons/<slug>/<variant>.svg`. Variants
+ * picked at build time (see `/tmp/thesvg-audit/audit.py`) to avoid two failure
+ * modes on our white logo tile:
  *
- * Items NOT listed here render as an initials monogram inside ItemLogo.
+ *   1. Wide wordmark — `default` is a logotype that shrinks illegibly in a
+ *      square tile. Substitutes: `color` (square + brand color) or `mono`
+ *      (square monochrome).
+ *   2. White-on-white — `default` is the dark-bg version with `fill="#fff"`
+ *      that disappears on our white tile. Substitute: `light` (the variant
+ *      designed for *light* backgrounds, with dark fills) or `mono`.
+ *
+ * Items NOT listed here fall through to the favicon stage (then initials)
+ * in `ItemLogo.tsx`. ~25 brands theSVG doesn't carry — Skool, Beehiiv,
+ * Descript, Apify, Together AI, Fly.io, etc. — rely on the favicon fallback.
  */
-export const ICON_SLUGS: Record<string, string> = {
+export const THESVG_SLUGS: Record<string, string> = {
   // ---------------- App Mode ----------------
   // Frontend
   nextjs: 'nextdotjs',
   react: 'react',
-  vue: 'vuedotjs',
+  vue: 'vue',
   svelte: 'svelte',
-  astro: 'astro',
-  solidjs: 'solid',
-  angular: 'angular',
-  remix: 'remix',
-  nuxt: 'nuxt',
+  astro: 'astro/light',
+  solidjs: 'solidjs',
+  angular: 'angular/mono',
+  remix: 'remix/light',
+  nuxt: 'nuxt/mono',
 
   // Styling / UI
-  tailwind: 'tailwindcss',
-  shadcn: 'shadcnui',
-  radix: 'radixui',
-  chakra: 'chakraui',
+  tailwind: 'tailwind-css/mono',
+  shadcn: 'shadcn-ui/light',
+  radix: 'radix-ui/light',
+  chakra: 'chakra-ui/mono',
   mantine: 'mantine',
   mui: 'mui',
   bootstrap: 'bootstrap',
 
-  // Backend Runtime
-  nodejs: 'nodedotjs',
+  // Backend
+  nodejs: 'nodedotjs/mono',
   bun: 'bun',
-  deno: 'deno',
+  deno: 'deno/light',
   'python-fastapi': 'fastapi',
-  go: 'go',
-  rails: 'rubyonrails',
-  phoenix: 'phoenixframework',
+  go: 'go/mono',
+  rails: 'ruby-on-rails',
+  phoenix: 'phoenix-framework',
   nestjs: 'nestjs',
   hono: 'hono',
   dotnet: 'dotnet',
-  spring: 'springboot',
+  spring: 'spring',
 
-  // Hosting — AWS + Azure trademarks removed from simple-icons direct CDN
-  // but preserved in Iconify's bundled snapshot; still resolve as simple-icons
-  // slugs via Iconify.
-  vercel: 'vercel',
-  'cloudflare-workers': 'cloudflareworkers',
-  'aws-lambda': 'logos:aws-lambda',
-  'aws-ec2': 'logos:aws-ec2',
-  'gcp-run': 'googlecloud',
-  'azure-app': 'logos:microsoft-azure',
-  fly: 'flydotio',
-  railway: 'railway',
+  // Hosting
+  vercel: 'vercel/light',
+  'cloudflare-workers': 'cloudflare-workers',
+  'cloudflare-pages': 'cloudflare-pages',
+  'aws-lambda': 'aws-aws-lambda',
+  'aws-ec2': 'aws-amazon-ec2',
+  'gcp-run': 'google-cloud',
+  'azure-app': 'microsoft-azure',
+  // fly: theSVG only ships a white-fill default, falls back to favicon.
+  railway: 'railway/light',
   render: 'render',
   netlify: 'netlify',
   digitalocean: 'digitalocean',
 
   // Database
   postgres: 'postgresql',
-  neon: 'logos:neon',
+  neon: 'neon',
   supabase: 'supabase',
-  planetscale: 'planetscale',
-  mysql: 'mysql',
+  planetscale: 'planetscale/light',
+  mysql: 'mysql/light',
   mongodb: 'mongodb',
   firebase: 'firebase',
-  dynamodb: 'logos:aws-dynamodb',
+  dynamodb: 'aws-amazon-dynamodb',
   convex: 'convex',
   turso: 'turso',
-  d1: 'cloudflare',
+  d1: 'cloudflare/color',
   redis: 'redis',
 
   // ORM
-  prisma: 'prisma',
+  prisma: 'prisma/light',
   drizzle: 'drizzle',
-  // kysely — not on Iconify, falls through to initials
   typeorm: 'typeorm',
   sequelize: 'sequelize',
   'raw-sql': 'postgresql',
 
   // Auth
-  clerk: 'clerk',
+  clerk: 'clerk/light',
   auth0: 'auth0',
   'supabase-auth': 'supabase',
-  // authjs — not on Iconify, falls through to initials
-  // workos — available on Iconify's logos pack
-  workos: 'logos:workos',
+  authjs: 'authdotjs',
+  // workos: theSVG variants all use white-fill via CSS class, falls back to favicon.
   'firebase-auth': 'firebase',
-  'better-auth': 'betterauth',
-  cognito: 'logos:aws-cognito',
+  'better-auth': 'better-auth',
+  cognito: 'aws-amazon-cognito',
 
   // Storage
-  s3: 'logos:aws-s3',
-  r2: 'cloudflare',
-  'vercel-blob': 'vercel',
-  gcs: 'googlecloudstorage',
-  'azure-blob': 'logos:microsoft-azure',
-  // uploadthing — not on Iconify, falls through to initials
+  s3: 'aws-amazon-simple-storage-service',
+  r2: 'cloudflare/color',
+  'vercel-blob': 'vercel-blob',
+  gcs: 'google-cloud-storage',
+  'azure-blob': 'microsoft-azure',
+  'supabase-storage': 'supabase',
 
   // Monitoring
   sentry: 'sentry',
   datadog: 'datadog',
-  newrelic: 'newrelic',
+  newrelic: 'new-relic',
   grafana: 'grafana',
-  // honeycomb, axiom — not on Iconify, initials
+  honeycomb: 'honeycomb/mono',
+  axiom: 'axiom/light',
+  'better-stack': 'better-stack',
 
   // Product Analytics
-  posthog: 'posthog',
-  amplitude: 'logos:amplitude-icon',
+  posthog: 'posthog/mono',
   mixpanel: 'mixpanel',
-  heap: 'logos:heap',
-  // june, statsig — not on Iconify, initials
 
   // Web Analytics
-  ga: 'googleanalytics',
-  plausible: 'plausibleanalytics',
+  ga: 'google-analytics',
+  plausible: 'plausible-analytics',
   fathom: 'fathom',
-  'simple-analytics': 'simpleanalytics',
-  'vercel-analytics': 'vercel',
-  'cf-analytics': 'cloudflare',
+  'simple-analytics': 'simple-analytics',
+  'vercel-analytics': 'vercel/light',
+  'cf-analytics': 'cloudflare/color',
 
   // Email
   resend: 'resend',
-  // postmark — not on Iconify, initials
-  // sendgrid — in Iconify's simple-icons bundle
-  sendgrid: 'logos:sendgrid',
-  ses: 'logos:aws-ses',
+  postmark: 'postmark',
+  ses: 'aws-amazon-simple-email-service',
   mailgun: 'mailgun',
   loops: 'loops',
 
   // Payments
-  stripe: 'stripe',
-  lemonsqueezy: 'lemonsqueezy',
+  stripe: 'stripe/mono',
+  lemonsqueezy: 'lemon-squeezy',
   paddle: 'paddle',
-  // polar — not on Iconify, initials
+  polar: 'polar/light',
   paypal: 'paypal',
 
-  // AI
-  anthropic: 'anthropic',
-  openai: 'logos:openai',
-  gemini: 'googlegemini',
-  'vercel-ai': 'vercel',
-  replicate: 'replicate',
-  // together, groq — not on Iconify, initials
+  // AI / LLM
+  anthropic: 'anthropic/light',
+  openai: 'openai/light',
+  gemini: 'gemini',
+  'vercel-ai': 'vercel/light',
+  replicate: 'replicate/light',
+  groq: 'groq',
+  // together: theSVG only carries a wide wordmark, falls back to favicon.
 
   // Search
-  algolia: 'algolia',
+  algolia: 'algolia/mono',
   meilisearch: 'meilisearch',
-  typesense: 'logos:typesense',
+  typesense: 'typesense',
   elastic: 'elastic',
   'postgres-fts': 'postgresql',
 
   // CMS
-  sanity: 'sanity',
+  sanity: 'sanity/light',
   contentful: 'contentful',
-  payload: 'payloadcms',
+  payload: 'payload-cms',
   strapi: 'strapi',
-  'notion-cms': 'notion',
+  'notion-cms': 'notion/mono',
   mdx: 'mdx',
 
   // CI/CD
-  'gh-actions': 'githubactions',
-  'vercel-deploys': 'vercel',
+  'gh-actions': 'github-actions',
+  'vercel-deploys': 'vercel/light',
   circleci: 'circleci',
   'gitlab-ci': 'gitlab',
   buildkite: 'buildkite',
 
   // ---------------- Content Mode ----------------
   // Ideation
-  notion: 'notion',
+  notion: 'notion/mono',
   obsidian: 'obsidian',
   airtable: 'airtable',
-  chatgpt: 'logos:openai',
-  claude: 'anthropic',
-  perplexity: 'perplexity',
+  chatgpt: 'openai/light',
+  claude: 'claude/color',
+  perplexity: 'perplexity/color',
   'x-trends': 'x',
+  spyder: 'spyder',
 
   // Scripting
-  'google-docs': 'googledocs',
-  'notion-w': 'notion',
-  'claude-w': 'anthropic',
-  'chatgpt-w': 'logos:openai',
-  // hemingway — not on Iconify, initials
+  'google-docs': 'google-docs',
+  'notion-w': 'notion/mono',
+  'claude-w': 'claude/color',
+  'chatgpt-w': 'openai/light',
   grammarly: 'grammarly',
 
   // Voice
   elevenlabs: 'elevenlabs',
-  // play-ht, cartesia — not on Iconify, initials
-  'openai-voice': 'logos:openai',
-  'descript-overdub': 'logos:descript',
+  'openai-voice': 'openai/light',
 
-  // Editing — Adobe trademarks pruned from simple-icons direct CDN but
-  // preserved in Iconify's bundled snapshot.
-  capcut: 'arcticons:capcut',
-  premiere: 'logos:adobe-premiere',
-  // final-cut — not on Iconify, initials
-  davinci: 'davinciresolve',
-  descript: 'logos:descript',
-  // opus-clip, remotion — not on Iconify, initials
+  // Editing
+  capcut: 'capcut',
+  premiere: 'premiere',
+  davinci: 'davinci-resolve',
+  remotion: 'remotion',
 
   // Short-form
-  'instagram-reels': 'instagram',
+  'instagram-reels': 'instagram/mono',
   tiktok: 'tiktok',
-  'youtube-shorts': 'youtubeshorts',
-  'linkedin-short': 'logos:linkedin-icon',
+  'youtube-shorts': 'youtube-shorts',
+  'linkedin-short': 'linkedin',
   'x-video': 'x',
 
   // Long-form
-  youtube: 'youtube',
+  youtube: 'youtube/mono',
   podcast: 'spotify',
-  'linkedin-long': 'logos:linkedin-icon',
+  'linkedin-long': 'linkedin',
   twitch: 'twitch',
 
   // Thumbnails
-  figma: 'figma',
-  canva: 'simple-icons:canva', // pruned from direct CDN; Iconify bundle keeps it (monochrome).
-  photoshop: 'logos:adobe-photoshop',
-  midjourney: 'logos:midjourney',
-  'nano-banana': 'googlegemini',
-  // ideogram — not on Iconify, initials
+  figma: 'figma/color',
+  canva: 'canva',
+  photoshop: 'photoshop',
+  midjourney: 'midjourney',
+  'nano-banana': 'gemini',
+  ideogram: 'ideogram',
 
   // Scheduling
   buffer: 'buffer',
   hootsuite: 'hootsuite',
-  // later, metricool, publer — not on Iconify, initials
-
-  // Analytics
-  // tubebuddy — not on Iconify, initials
-  vidiq: 'arcticons:vidiq',
-  // metricool-a — not on Iconify, initials
-  apify: 'devicon:apify',
 
   // Community
-  skool: 'arcticons:skool',
   circle: 'circle',
   discord: 'discord',
-  // beehiiv — not on Iconify, initials
   substack: 'substack',
   convertkit: 'kit', // ConvertKit rebranded to Kit.
 
   // Monetization
-  adsense: 'googleadsense',
+  adsense: 'google-adsense',
 }
 
 /**
- * Build the CDN URL for an icon spec.
+ * Build the CDN URL for a theSVG path.
  *
- * Dual source by design:
- *   - Bare slug → Simple Icons direct CDN, which bakes the brand's primary
- *     color into the SVG `fill`. Every working simple-icons brand ships
- *     brand-colored.
- *   - `"pack:name"` → Iconify, for packs the direct CDN doesn't cover
- *     (trademark-pruned brands in the `logos` pack, pictograms in
- *     `arcticons`, etc.) and which typically ship multi-color branded
- *     SVGs too.
- *
- * The brand-color goal is why we don't round-trip everything through
- * Iconify's simple-icons pack: it rewrites SVG fills to `currentColor`,
- * stripping the brand color. Direct CDN preserves it.
+ * Accepts either a bare slug (uses the `default` variant) or `slug/variant`
+ * (uses the explicit variant, e.g. `vercel/light`).
  */
-export function iconUrl(spec: string): string {
-  if (spec.includes(':')) {
-    const [pack, name] = spec.split(':', 2)
-    return `https://api.iconify.design/${pack}/${name}.svg`
-  }
-  return `https://cdn.simpleicons.org/${spec}`
+export function thesvgUrl(slugOrPath: string): string {
+  const path = slugOrPath.includes('/') ? slugOrPath : `${slugOrPath}/default`
+  return `https://thesvg.org/icons/${path}.svg`
 }

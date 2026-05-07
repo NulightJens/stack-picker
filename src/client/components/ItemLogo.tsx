@@ -1,16 +1,15 @@
 import { useState, useSyncExternalStore } from 'react'
 import { initialsFor } from '../../shared/icons'
-import { ICON_SLUGS } from '../../shared/iconSlugs'
+import { THESVG_SLUGS, thesvgUrl } from '../../shared/iconSlugs'
 
-type Stage = 'favicon' | 'simpleicons' | 'initials'
+type Stage = 'thesvg' | 'favicon' | 'initials'
 
 interface Props {
   name: string
   /** The item's canonical domain — used to fetch a Google favicon via our
-      Worker proxy. Items without a domain skip straight to the Simple Icons
-      (or initials) stage. */
+      Worker proxy as the fallback when theSVG doesn't carry the brand. */
   domain?: string
-  /** Our internal item id — looked up in ICON_SLUGS for the fallback stage. */
+  /** Our internal item id — looked up in THESVG_SLUGS for the primary stage. */
   itemId?: string
   size: number
   rounded?: number
@@ -53,32 +52,24 @@ function faviconUrl(domain: string): string {
   return `/api/favicon?domain=${encodeURIComponent(domain)}`
 }
 
-/** Monochrome Simple Icons. The `/0a0a0a` path segment forces the SVG fill
-    to that color. Black on our always-white logo tile reads in both light
-    and dark modes — no theme branching needed for the fallback. */
-function simpleIconsUrl(slug: string): string {
-  return `https://cdn.simpleicons.org/${slug}/0a0a0a`
-}
-
 /**
  * Logo rendering strategy:
- *   1. Favicon — Google s2 favicons via our same-origin /api/favicon proxy.
- *      Multi-color, matches how the real brand looks in a browser tab.
- *   2. Simple Icons monochrome fallback — for items without a domain, or
- *      when the favicon 404s. Only runs if ICON_SLUGS has a bare-slug entry
- *      (pack: entries would go to Iconify which is blocked by CSP).
+ *   1. theSVG — full-color brand SVG from `https://thesvg.org/icons/<slug>/default.svg`.
+ *      Covers ~82% of items (the rest fall through to favicon).
+ *   2. Favicon — Google s2 favicons via our same-origin /api/favicon proxy.
+ *      Catches the ~25 brands theSVG doesn't carry (Skool, Beehiiv, Descript,
+ *      Apify, etc.) and is same-origin so it embeds cleanly in PNG exports.
  *   3. Initials — two-char monogram tile, theme-aware.
  *
- * Logo tile stays white with a subtle border in both img stages. Favicons
- * can be transparent or white-bg; the white tile + border guarantees a
- * visible edge regardless of favicon character.
+ * Logo tile stays white with a subtle border in both img stages so brand
+ * colors and transparent favicons both have a visible edge.
  */
 export default function ItemLogo({ name, domain, itemId, size, rounded, inverted = false }: Props) {
-  const slug = itemId ? ICON_SLUGS[itemId] : undefined
+  const slug = itemId ? THESVG_SLUGS[itemId] : undefined
+  const hasSlug = typeof slug === 'string' && slug.length > 0
   const hasFavicon = isValidDomain(domain)
-  const hasSlug = typeof slug === 'string' && !slug.includes(':')
 
-  const initialStage: Stage = hasFavicon ? 'favicon' : hasSlug ? 'simpleicons' : 'initials'
+  const initialStage: Stage = hasSlug ? 'thesvg' : hasFavicon ? 'favicon' : 'initials'
   // Reset the stage machine when the slotted item changes — otherwise a
   // previously-fallen-through instance stays stuck on 'initials' when the
   // user picks a different tool in the same layer slot. Using the prev-key
@@ -87,6 +78,11 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, inverted
   const slotKey = `${domain ?? ''}|${slug ?? ''}`
   const [prevSlotKey, setPrevSlotKey] = useState(slotKey)
   const [stage, setStage] = useState<Stage>(initialStage)
+  // When the slot changes, useState still returns the previous value for the
+  // current render — only subsequent renders see the reset. Use `initialStage`
+  // for this render so we don't dereference a stage that no longer matches the
+  // item (e.g. stage='thesvg' when the new item has no slug → undefined deref).
+  const effectiveStage = prevSlotKey !== slotKey ? initialStage : stage
   if (prevSlotKey !== slotKey) {
     setPrevSlotKey(slotKey)
     setStage(initialStage)
@@ -94,7 +90,7 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, inverted
   const radius = rounded ?? Math.round(size * 0.22)
   const isDark = useIsDark()
 
-  if (stage === 'initials') {
+  if (effectiveStage === 'initials') {
     const tileIsLight = inverted ? !isDark : isDark
     return (
       <div
@@ -121,7 +117,7 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, inverted
   }
 
   const src =
-    stage === 'favicon' ? faviconUrl(domain as string) : simpleIconsUrl(slug as string)
+    effectiveStage === 'thesvg' ? thesvgUrl(slug as string) : faviconUrl(domain as string)
 
   return (
     <img
@@ -142,7 +138,7 @@ export default function ItemLogo({ name, domain, itemId, size, rounded, inverted
         boxSizing: 'border-box',
       }}
       onError={() => {
-        if (stage === 'favicon' && hasSlug) setStage('simpleicons')
+        if (effectiveStage === 'thesvg' && hasFavicon) setStage('favicon')
         else setStage('initials')
       }}
     />
