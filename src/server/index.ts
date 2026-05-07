@@ -109,7 +109,10 @@ const HTML_CSP = [
   // same-origin /api/favicon proxy, covered by 'self') is the fallback for
   // brands theSVG doesn't carry.
   "img-src 'self' data: https://thesvg.org",
-  "connect-src 'self'",
+  // html-to-image re-fetches each <img> with fetch() to inline the bytes
+  // into the exported PNG. Without theSVG here, the inlining XHR is blocked
+  // and the export ships empty tiles.
+  "connect-src 'self' https://thesvg.org",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
