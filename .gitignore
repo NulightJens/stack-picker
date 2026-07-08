@@ -18,3 +18,8 @@ public/private/
 
 # Vendored from ~/Projects/jensheitmann.com/packages/site-header
 src/client/vendor/site-header/
+.DS_Store
+.env.*
+!.env.example
+node_modules/workerd/bin/workerd
+node_modules/@cloudflare/workerd-darwin-arm64/bin/workerd
