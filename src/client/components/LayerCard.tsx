@@ -14,9 +14,10 @@ export default function LayerCard({ layer, selectedItemId, onToggle }: Props) {
   return (
     <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
       <header className="mb-3">
-        <div className="text-[11px] font-bold tracking-[0.08em] uppercase text-[var(--text-primary)]">
+        {/* Card title raised off label weight to the §1.3 floor (was 11px uppercase). */}
+        <h2 className="text-[16px] font-bold tracking-tight text-[var(--text-primary)] text-balance">
           {layer.name}
-        </div>
+        </h2>
         <div className="text-xs text-[var(--text-secondary)] mt-0.5">{layer.subtitle}</div>
       </header>
 

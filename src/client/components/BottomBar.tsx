@@ -3,6 +3,7 @@ import { Copy, Download, Image as ImageIcon, RotateCcw, FileCode, MoreHorizontal
 import type { SelectedStack, StackMode } from '../../shared/types'
 import ItemLogo from './ItemLogo'
 import StackSheet from './StackSheet'
+import Mascot from './Mascot'
 import { useIsTouch } from '../hooks/useIsTouch'
 
 export type BottomAction = 'copy_prompt' | 'copy_stack_image' | 'download_png' | 'download_diagram' | 'reset'
@@ -108,7 +109,10 @@ function TouchStrip({
             Your stack
           </div>
           {pickedCount === 0 ? (
-            <div className="text-sm text-[var(--text-secondary)]">Nothing picked yet — start tapping.</div>
+            <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+              <Mascot size={26} alt="" className="flex-shrink-0" />
+              Nothing picked yet — start tapping.
+            </div>
           ) : (
             <div className="flex items-center">
               {picks.map((p, i) => (
@@ -201,7 +205,10 @@ function HoverStrip({
         </div>
 
         {pickedCount === 0 ? (
-          <div className="text-sm text-[var(--text-secondary)]">Nothing picked yet — start clicking.</div>
+          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+            <Mascot size={26} alt="" className="flex-shrink-0" />
+            Nothing picked yet — start clicking.
+          </div>
         ) : (
           <div className="flex items-center">
             {inline.map((p, i) => (
