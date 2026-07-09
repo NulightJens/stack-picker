@@ -3,47 +3,59 @@
 @source "./vendor/site-header";
 
 @theme {
-  --font-sans: 'Manrope', sans-serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+  /* REDLINE geometry (§1.4): cards 14 / controls 10 / chips 8. Shifting the
+     Tailwind scale here moves every rounded-md/lg/xl without touching components. */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
 }
 
+/* ── REDLINE tokens (jensheitmann.com family standard §1.1–1.2) ──────────────
+   Card is LIGHTER than the page. Stack has no like-metric, so the accent stays
+   monochrome INK; the colorful tool logos are product and stay colorful. Color
+   enters only through those logos + the squid mascot. */
 :root {
-  --background: #ffffff;
-  --surface: #f9fafb;
-  --surface-hover: #f3f4f6;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --text-primary: #15171a;
-  --text-secondary: #666666;
-  --text-muted: #999999;
-  --accent: #15171a;
+  --background: #F5F5F4;   /* paper */
+  --surface: #FFFFFF;      /* card — lighter than the ground */
+  --surface-hover: #FBFBFA;
+  --border: #E6E6E3;
+  --border-strong: #D7D7D3;
+  --text-primary: #141516;
+  --text-secondary: #5B5E66;
+  --text-muted: #8B8E95;
+  --accent: #141516;       /* ink — monochrome (the active pick, not the squid blue) */
   --accent-hover: #000000;
-  --accent-soft: #f3f4f6;
-  --accent-text: #ffffff;
-  --cta: #15171a;
-  --cta-text: #ffffff;
+  --accent-soft: #F0F0EE;
+  --accent-text: #FFFFFF;
+  --cta: #141516;
+  --cta-text: #FFFFFF;
   --danger: #ef4444;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.06);
+  --shadow-sm: 0 1px 2px rgba(20,21,22,.05);
+  --shadow-md: 0 1px 2px rgba(20,21,22,.04), 0 12px 28px -12px rgba(20,21,22,.14);
 }
 
 .dark {
-  --background: #0a0a0a;
-  --surface: #111111;
-  --surface-hover: #1a1a1a;
-  --border: #1f1f1f;
-  --border-strong: #2a2a2a;
-  --text-primary: #fafafa;
-  --text-secondary: #a0a0a0;
-  --text-muted: #666666;
-  --accent: #fafafa;
-  --accent-hover: #ffffff;
-  --accent-soft: #1a1a1a;
-  --accent-text: #0a0a0a;
-  --cta: #fafafa;
-  --cta-text: #0a0a0a;
+  --background: #0B0B0C;
+  --surface: #151517;
+  --surface-hover: #1C1C1F;
+  --border: #242428;
+  --border-strong: #303036;
+  --text-primary: #F4F4F2;
+  --text-secondary: #A2A4AA;
+  --text-muted: #6D6F76;
+  --accent: #F4F4F2;
+  --accent-hover: #FFFFFF;
+  --accent-soft: #1C1C1F;
+  --accent-text: #0B0B0C;
+  --cta: #F4F4F2;
+  --cta-text: #0B0B0C;
   --danger: #f87171;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.5);
+  /* Dark depth = card lighter than ground, not shadows (§1.5). */
+  --shadow-sm: none;
+  --shadow-md: none;
 }
 
 html { scroll-behavior: smooth; }
@@ -51,8 +63,22 @@ html { scroll-behavior: smooth; }
 body {
   background-color: var(--background);
   color: var(--text-primary);
+  font-family: var(--font-sans);
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Visible focus everywhere (§1.6). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Data + labels layer (§1.3) + crisp pixel-art mascot (§1.8). */
+.tabular { font-variant-numeric: tabular-nums; }
+.pixelated { image-rendering: pixelated; }
 
 @supports (padding: env(safe-area-inset-bottom)) {
   .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
